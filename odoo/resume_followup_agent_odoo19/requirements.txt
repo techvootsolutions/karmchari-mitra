@@ -1,0 +1,16 @@
+# External Python dependencies for Resume Follow-Up Agent module
+# Install these dependencies using: pip install -r requirements.txt
+
+# OmniDimension AI Python SDK for agent creation and management
+omnidimension>=1.0.0
+
+# Requests library (usually already included in Odoo)
+requests>=2.25.0
+
+# CV/Resume parsing libraries
+PyPDF2>=3.0.0
+pdfplumber>=0.9.0
+python-docx>=0.8.11
+
+# ATS Resume Checker - Spell checking
+pyspellchecker>=0.7.0

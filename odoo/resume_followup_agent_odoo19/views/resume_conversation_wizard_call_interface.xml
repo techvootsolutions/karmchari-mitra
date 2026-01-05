@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Mobile-Style Call Interface View (shown during active call) -->
+    <record id="view_resume_conversation_wizard_call_interface" model="ir.ui.view">
+        <field name="name">resume.conversation.wizard.call.interface</field>
+        <field name="model">resume.conversation.wizard</field>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <form string="Active Call" class="oe_call_interface" 
+                  invisible="call_status != 'in_progress'">
+                <div class="oe_call_screen" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 20px; text-align: center; color: white;">
+                    <!-- Call Duration -->
+                    <div style="margin-top: 40px; margin-bottom: 30px;">
+                        <i class="fa fa-phone" style="font-size: 24px; color: #4CAF50; margin-bottom: 10px;"/>
+                        <div style="font-size: 28px; font-weight: bold; color: #4CAF50; margin-top: 10px;">
+                            <field name="call_duration_display" readonly="1" nolabel="1" 
+                                   style="font-family: monospace;"/>
+                        </div>
+                    </div>
+                    
+                    <!-- Candidate Information -->
+                    <div style="margin: 30px 0;">
+                        <div style="font-size: 32px; font-weight: bold; margin-bottom: 10px;">
+                            <field name="candidate_name" readonly="1" nolabel="1" 
+                                   style="color: white; background: transparent; border: none; font-size: 32px;"/>
+                        </div>
+                        <div style="font-size: 18px; color: #B0BEC5; margin-top: 5px;">
+                            <i class="fa fa-phone"/> <field name="candidate_phone" readonly="1" nolabel="1" 
+                                                             style="color: #B0BEC5; background: transparent; border: none;"/>
+                        </div>
+                    </div>
+                    
+                    <!-- Avatar/Profile Picture Placeholder -->
+                    <div style="margin: 40px auto; width: 150px; height: 150px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255,255,255,0.3);">
+                        <i class="fa fa-user" style="font-size: 80px; color: rgba(255,255,255,0.7);"/>
+                    </div>
+                    
+                    <!-- Call Status -->
+                    <div style="margin: 30px 0; font-size: 16px; color: #B0BEC5;">
+                        <i class="fa fa-circle" style="color: #4CAF50; font-size: 12px; margin-right: 5px;"/>
+                        Call in progress...
+                    </div>
+                    
+                    <!-- End Call Button -->
+                    <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 400px; padding: 0 20px;">
+                        <button name="action_end_call" string="End Call" type="object" 
+                                class="btn btn-danger btn-lg" 
+                                style="width: 80px; height: 80px; border-radius: 50%; background: #f44336; border: none; box-shadow: 0 4px 8px rgba(0,0,0,0.3); font-size: 16px; font-weight: bold; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fa fa-phone" style="transform: rotate(135deg); font-size: 24px; margin-right: 0;"/>
+                        </button>
+                        <div style="margin-top: 15px; text-align: center; color: white; font-size: 14px;">
+                            Tap to end call
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden fields for data -->
+                    <field name="call_status" invisible="1"/>
+                    <field name="call_start_time" invisible="1"/>
+                    <field name="call_end_time" invisible="1"/>
+                    <field name="call_id" invisible="1"/>
+                    <field name="call_sid" invisible="1"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Update main wizard view to show call interface when call is active -->
+    <record id="view_resume_conversation_wizard_form" model="ir.ui.view">
+        <field name="name">resume.conversation.wizard.form</field>
+        <field name="model">resume.conversation.wizard</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <form string="Phone Call - Resume Follow-Up" class="oe_title">
+                <header>
+                    <button name="action_start_call" string="📞 Start Call" type="object" 
+                            class="oe_highlight btn-lg" 
+                            invisible="call_status != 'not_started'"
+                            help="Initiate the phone call to the candidate"/>
+                    <button name="action_end_call" string="🔴 End Call" type="object" 
+                            class="btn-danger btn-lg" 
+                            invisible="call_status != 'in_progress'"
+                            help="End the call and automatically save conversation"/>
+                    <button name="action_save_call" string="💾 Save Call" type="object" 
+                            class="oe_highlight" 
+                            invisible="call_status != 'completed'"
+                            help="Save the conversation details"/>
+                    <field name="call_status" widget="statusbar" statusbar_visible="not_started,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <!-- Mobile Call Interface (shown when call is in progress) -->
+                    <div invisible="call_status != 'in_progress'" 
+                         style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 500px; padding: 40px 20px; text-align: center; color: white; border-radius: 10px; margin-bottom: 20px;">
+                        <!-- Call Duration -->
+                        <div style="margin-top: 20px; margin-bottom: 30px;">
+                            <i class="fa fa-phone" style="font-size: 32px; color: #4CAF50; margin-bottom: 15px; display: block;"/>
+                            <div style="font-size: 36px; font-weight: bold; color: #4CAF50; font-family: monospace; margin-top: 10px;">
+                                <field name="call_duration_display" readonly="1" nolabel="1" 
+                                       style="color: #4CAF50; background: transparent; border: none; font-size: 36px; font-family: monospace; text-align: center;"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Candidate Information -->
+                        <div style="margin: 30px 0;">
+                            <div style="font-size: 36px; font-weight: bold; margin-bottom: 15px; color: white;">
+                                <field name="candidate_name" readonly="1" nolabel="1" 
+                                       style="color: white; background: transparent; border: none; font-size: 36px; text-align: center; font-weight: bold;"/>
+                            </div>
+                            <div style="font-size: 20px; color: #B0BEC5; margin-top: 10px;">
+                                <i class="fa fa-phone" style="margin-right: 5px;"/> 
+                                <field name="candidate_phone" readonly="1" nolabel="1" 
+                                       style="color: #B0BEC5; background: transparent; border: none; font-size: 20px; text-align: center;"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Avatar/Profile Picture -->
+                        <div style="margin: 40px auto; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; border: 4px solid rgba(255,255,255,0.3);">
+                            <i class="fa fa-user" style="font-size: 100px; color: rgba(255,255,255,0.7);"/>
+                        </div>
+                        
+                        <!-- Call Status Indicator -->
+                        <div style="margin: 30px 0; font-size: 18px; color: #B0BEC5;">
+                            <i class="fa fa-circle" style="color: #4CAF50; font-size: 14px; margin-right: 8px; animation: pulse 2s infinite;"/>
+                            Call in progress...
+                        </div>
+                        
+                        <!-- End Call Button - Large and Prominent -->
+                        <div style="margin-top: 60px; text-align: center;">
+                            <button name="action_end_call" string="End Call" type="object" 
+                                    class="btn btn-danger" 
+                                    style="width: 100px; height: 100px; border-radius: 50%; background: #f44336; border: none; box-shadow: 0 6px 12px rgba(0,0,0,0.4); font-size: 18px; font-weight: bold; color: white; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                <i class="fa fa-phone" style="transform: rotate(135deg); font-size: 32px;"/>
+                            </button>
+                            <div style="margin-top: 20px; text-align: center; color: white; font-size: 16px; font-weight: bold;">
+                                Tap to End Call
+                            </div>
+                            <div style="margin-top: 10px; text-align: center; color: rgba(255,255,255,0.7); font-size: 14px;">
+                                Conversation will be automatically saved
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Call Status Banner -->
+                    <div class="alert alert-success" role="alert" invisible="call_status != 'in_progress'">
+                        <h4><i class="fa fa-phone"/> Call In Progress</h4>
+                        <p><strong>Calling:</strong> <field name="candidate_phone" readonly="1" class="d-inline"/></p>
+                        <p><i class="fa fa-clock-o"/> Duration: <field name="call_duration_display" readonly="1" class="d-inline"/></p>
+                        <p><i class="fa fa-info-circle"/> Click "End Call" when the conversation is finished. The conversation will be automatically saved.</p>
+                    </div>
+                    
+                    <div class="alert alert-info" role="alert" invisible="call_status != 'not_started'">
+                        <h4><strong>📞 Ready to Make Call</strong></h4>
+                        <p><strong>Call the candidate at:</strong> 
+                            <strong>
+                                <i class="fa fa-phone"/> <field name="candidate_phone" readonly="1"/>
+                            </strong>
+                        </p>
+                        <p><i class="fa fa-info-circle"/> Click <strong>"Start Call"</strong> button to initiate the phone call.</p>
+                        <p>Once the call starts, you can collect information during the conversation. When finished, click <strong>"End Call"</strong> to automatically save all details.</p>
+                    </div>
+                    
+                    <div class="alert alert-success" role="alert" invisible="call_status != 'completed'">
+                        <h4><strong>✅ Call Completed</strong></h4>
+                        <p>The call has been ended. All conversation details have been automatically saved to the Conversation section.</p>
+                        <p>You can review and edit the collected information below, or click "Save Call" to finalize.</p>
+                    </div>
+                    
+                    <group invisible="call_status == 'in_progress'">
+                        <group>
+                            <field name="candidate_name" readonly="1"/>
+                            <field name="candidate_phone" readonly="1"/>
+                            <field name="position" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="agent_settings_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="agent_name"/>
+                            <field name="company_name" readonly="1"/>
+                            <field name="job_title"/>
+                        </group>
+                        <group string="AI Call Settings">
+                            <field name="telephony_config_id" 
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   invisible="agent_settings_id.telephony_config_id != False"
+                                   help="Override telephony config for this call (optional)"/>
+                            <field name="use_ai_agent" 
+                                   invisible="not telephony_config_id"
+                                   help="Enable AI agent to automatically place and handle calls"/>
+                        </group>
+                    </group>
+                    <group invisible="call_status == 'in_progress'">
+                        <group>
+                            <field name="call_start_time"/>
+                            <field name="call_end_time" invisible="call_status == 'not_started'"/>
+                            <field name="duration" readonly="1" invisible="call_status == 'not_started'"/>
+                        </group>
+                        <group>
+                            <field name="call_quality" invisible="call_status == 'not_started'"/>
+                        </group>
+                    </group>
+                    <notebook invisible="call_status == 'in_progress'">
+                        <page string="Collected Information" name="collected_info">
+                            <group>
+                                <group>
+                                    <field name="introduction" widget="text" 
+                                           placeholder="Brief introduction about the candidate..."/>
+                                    <field name="current_position" 
+                                           placeholder="Current job title/position"/>
+                                    <field name="current_salary" 
+                                           placeholder="Current salary"/>
+                                </group>
+                                <group>
+                                    <field name="expected_salary" 
+                                           placeholder="Expected salary for this role"/>
+                                    <field name="notice_period" 
+                                           placeholder="Notice period (e.g., 2 weeks, 1 month)"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Call Notes" name="notes">
+                            <field name="notes" widget="text" 
+                                   placeholder="Add notes from the phone call here..."/>
+                        </page>
+                        <page string="Conversation Guide" name="guide">
+                            <div class="alert alert-info">
+                                <h4>Conversation Flow:</h4>
+                                <p><i class="fa fa-info-circle"/> Questions are loaded from Agent Settings. You can edit them in Agent Settings → Conversation Questions tab.</p>
+                                <p>Use placeholders: {candidate_name}, {agent_name}, {company_name}, {job_title}</p>
+                            </div>
+                            <field name="conversation_questions" widget="text" readonly="1" nolabel="1" invisible="1"/>
+                            <group>
+                                <div class="alert alert-warning">
+                                    <p><strong>Note:</strong> The conversation flow is configured in Agent Settings. Questions are displayed dynamically based on the selected agent settings.</p>
+                                    <p>To view or edit questions, go to: <strong>Resume Follow-Up → Configuration → Agent Settings</strong> → Select your agent → <strong>Conversation Questions</strong> tab</p>
+                                </div>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

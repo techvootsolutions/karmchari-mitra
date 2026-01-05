@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Phone Call Wizard Form View -->
+    <record id="view_resume_conversation_wizard_form" model="ir.ui.view" forcecreate="1">
+        <field name="name">resume.conversation.wizard.form</field>
+        <field name="model">resume.conversation.wizard</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <form string="Phone Call - Resume Follow-Up" class="oe_title">
+                <header>
+                    <button name="action_start_call" string="📞 Start Call" type="object" 
+                            class="oe_highlight btn-lg" 
+                            invisible="call_status != 'not_started'"
+                            help="Initiate the phone call to the candidate"/>
+                    <!-- End Call button - ALWAYS visible when call is in progress (backup to mobile interface button) -->
+                    <button name="action_end_call" string="🔴 End Call" type="object" 
+                            class="btn-danger btn-lg" 
+                            invisible="call_status != 'in_progress'"
+                            help="End the call and automatically save conversation to Conversation section"
+                            style="font-size: 18px; padding: 12px 24px;"/>
+                    <button name="action_save_call" string="💾 Save Call" type="object" 
+                            class="oe_highlight" 
+                            invisible="call_status != 'completed'"
+                            help="Save the conversation details"/>
+                    <field name="call_status" widget="statusbar" statusbar_visible="not_started,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <!-- Mobile-Style Call Interface (shown when call is in progress) -->
+                    <div invisible="call_status != 'in_progress'" 
+                         style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 600px; padding: 40px 20px; text-align: center; color: white; border-radius: 10px; margin-bottom: 20px; position: relative;">
+                        <!-- Call Duration Timer -->
+                        <div style="margin-top: 30px; margin-bottom: 40px;">
+                            <i class="fa fa-phone" style="font-size: 40px; color: #4CAF50; margin-bottom: 20px; display: block;"/>
+                            <div style="font-size: 48px; font-weight: bold; color: #4CAF50; font-family: 'Courier New', monospace; margin-top: 15px; letter-spacing: 2px;">
+                                <field name="call_duration_display" readonly="1" nolabel="1" 
+                                       style="color: #4CAF50; background: transparent; border: none; font-size: 48px; font-family: 'Courier New', monospace; text-align: center; font-weight: bold;"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Candidate Information -->
+                        <div style="margin: 40px 0;">
+                            <div style="font-size: 42px; font-weight: bold; margin-bottom: 20px; color: white; line-height: 1.2;">
+                                <field name="candidate_name" readonly="1" nolabel="1" 
+                                       style="color: white; background: transparent; border: none; font-size: 42px; text-align: center; font-weight: bold;"/>
+                            </div>
+                            <div style="font-size: 22px; color: #B0BEC5; margin-top: 15px;">
+                                <i class="fa fa-phone" style="margin-right: 8px;"/> 
+                                <field name="candidate_phone" readonly="1" nolabel="1" 
+                                       style="color: #B0BEC5; background: transparent; border: none; font-size: 22px; text-align: center;"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Avatar/Profile Picture -->
+                        <div style="margin: 50px auto; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; border: 5px solid rgba(255,255,255,0.3); box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                            <i class="fa fa-user" style="font-size: 120px; color: rgba(255,255,255,0.7);"/>
+                        </div>
+                        
+                        <!-- Call Status Indicator -->
+                        <div style="margin: 40px 0; font-size: 20px; color: #B0BEC5;">
+                            <i class="fa fa-circle" style="color: #4CAF50; font-size: 16px; margin-right: 10px; animation: pulse 2s infinite;"/>
+                            Call in progress...
+                        </div>
+                        
+                        <!-- End Call Button - Large, Red, Prominent -->
+                        <div style="margin-top: 80px; text-align: center; padding-bottom: 40px;">
+                            <button name="action_end_call" string="End Call" type="object" 
+                                    class="btn btn-danger" 
+                                    style="width: 120px; height: 120px; border-radius: 50%; background: #f44336; border: 5px solid rgba(255,255,255,0.3); box-shadow: 0 8px 20px rgba(244,67,54,0.5); font-size: 20px; font-weight: bold; color: white; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s;">
+                                <i class="fa fa-phone" style="transform: rotate(135deg); font-size: 40px;"/>
+                            </button>
+                            <div style="margin-top: 25px; text-align: center; color: white; font-size: 18px; font-weight: bold;">
+                                Tap to End Call
+                            </div>
+                            <div style="margin-top: 10px; text-align: center; color: rgba(255,255,255,0.8); font-size: 14px;">
+                                Conversation will be automatically saved
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Regular Interface (shown when call is NOT in progress) -->
+                    <div invisible="call_status == 'in_progress'">
+                        <div class="alert alert-info" role="alert" invisible="call_status != 'not_started'">
+                            <h4><strong>📞 Ready to Make Call</strong></h4>
+                            <p><strong>Call the candidate at:</strong> 
+                                <strong>
+                                    <i class="fa fa-phone"/> <field name="candidate_phone" readonly="1"/>
+                                </strong>
+                            </p>
+                            <p><i class="fa fa-info-circle"/> Click <strong>"Start Call"</strong> button to initiate the phone call.</p>
+                            <p>Once the call starts, a mobile-style call interface will appear with a prominent "End Call" button.</p>
+                        </div>
+                        
+                        <div class="alert alert-success" role="alert" invisible="call_status != 'completed'">
+                            <h4><strong>✅ Call Completed</strong></h4>
+                            <p>The call has been ended. All conversation details have been automatically saved to the Conversation section.</p>
+                            <p>You can review and edit the collected information below, or click "Save Call" to finalize.</p>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="candidate_name" readonly="1"/>
+                                <field name="candidate_phone" readonly="1"/>
+                                <field name="position" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="agent_settings_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                                <field name="agent_name"/>
+                                <field name="company_name" readonly="1"/>
+                                <field name="job_title"/>
+                            </group>
+                            <group string="AI Call Settings">
+                                <field name="telephony_config_id" 
+                                       options="{'no_create': True, 'no_create_edit': True}"
+                                       invisible="agent_settings_id.telephony_config_id != False"
+                                       help="Override telephony config for this call (optional)"/>
+                                <field name="use_ai_agent" 
+                                       invisible="not telephony_config_id"
+                                       help="Enable AI agent to automatically place and handle calls"/>
+                                <field name="preferred_language" 
+                                       widget="radio" 
+                                       options="{'horizontal': true}"
+                                       invisible="not use_ai_agent"
+                                       help="Select language for conversation. 'Auto Detect' will automatically detect language from candidate's first response."/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="call_start_time"/>
+                                <field name="call_end_time" invisible="call_status == 'not_started'"/>
+                                <field name="duration" readonly="1" invisible="call_status == 'not_started'"/>
+                            </group>
+                            <group>
+                                <field name="call_quality" invisible="call_status == 'not_started'"/>
+                            </group>
+                        </group>
+                        <notebook>
+                        <page string="Collected Information" name="collected_info">
+                            <group>
+                                <group>
+                                    <field name="introduction" widget="text" 
+                                           placeholder="Brief introduction about the candidate..."/>
+                                    <field name="current_position" 
+                                           placeholder="Current job title/position"/>
+                                    <field name="current_salary" 
+                                           placeholder="Current salary"/>
+                                </group>
+                                <group>
+                                    <field name="expected_salary" 
+                                           placeholder="Expected salary for this role"/>
+                                    <field name="notice_period" 
+                                           placeholder="Notice period (e.g., 2 weeks, 1 month)"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Call Notes" name="notes">
+                            <field name="notes" widget="text" 
+                                   placeholder="Add notes from the phone call here..."/>
+                        </page>
+                        <page string="Conversation Guide" name="guide">
+                            <div class="alert alert-info">
+                                <h4>Conversation Flow:</h4>
+                                <p><i class="fa fa-info-circle"/> Questions are loaded from Agent Settings. You can edit them in Agent Settings → Conversation Questions tab.</p>
+                                <p>Use placeholders: {candidate_name}, {agent_name}, {company_name}, {job_title}</p>
+                            </div>
+                            <field name="conversation_questions" widget="text" readonly="1" nolabel="1" invisible="1"/>
+                            <group>
+                                <div class="alert alert-warning">
+                                    <p><strong>Note:</strong> The conversation flow is configured in Agent Settings. Questions are displayed dynamically based on the selected agent settings.</p>
+                                    <p>To view or edit questions, go to: <strong>Resume Follow-Up → Configuration → Agent Settings</strong> → Select your agent → <strong>Conversation Questions</strong> tab</p>
+                                </div>
+                            </group>
+                        </page>
+                        </notebook>
+                    </div>
+                </sheet>
+                <!-- Add CSS and JavaScript for call interface -->
+                <style>
+                    @keyframes pulse {
+                        0% { opacity: 1; }
+                        50% { opacity: 0.5; }
+                        100% { opacity: 1; }
+                    }
+                    .oe_call_interface .btn-danger:hover {
+                        background: #d32f2f !important;
+                        transform: scale(1.05);
+                        box-shadow: 0 12px 25px rgba(244,67,54,0.6) !important;
+                    }
+                    .call-interface-container {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        z-index: 9999;
+                        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                    }
+                </style>
+                <script>
+                    // Auto-refresh call duration when call is in progress
+                    (function() {
+                        var callStatus = document.querySelector('[name="call_status"]');
+                        if (callStatus &amp;&amp; callStatus.value === 'in_progress') {
+                            // Refresh every 1 second to update duration
+                            setInterval(function() {
+                                var form = document.querySelector('form[data-model="resume.conversation.wizard"]');
+                                if (form) {
+                                    // Trigger recompute of duration field
+                                    var durationField = form.querySelector('[name="call_duration_display"]');
+                                    if (durationField) {
+                                        // Force recompute by triggering change event
+                                        var evt = new Event('change', { bubbles: true });
+                                        durationField.dispatchEvent(evt);
+                                    }
+                                }
+                            }, 1000);
+                        }
+                    })();
+                </script>
+            </form>
+        </field>
+    </record>
+
+    <!-- Phone Call Wizard Action -->
+    <record id="action_resume_conversation_wizard" model="ir.actions.act_window">
+        <field name="name">Start Phone Call</field>
+        <field name="res_model">resume.conversation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Bulk CV Upload Wizard Form View -->
+    <record id="view_bulk_cv_upload_wizard_form" model="ir.ui.view">
+        <field name="name">bulk.cv.upload.wizard.form</field>
+        <field name="model">bulk.cv.upload.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk CV Upload and ATS Analysis">
+                <header>
+                    <button name="action_upload_and_process" string="Upload &amp; Process All CVs" type="object" class="oe_highlight" icon="fa-upload"/>
+                    <button name="action_view_candidates" string="View Created Candidates" type="object" icon="fa-users" invisible="not candidate_ids"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="position"/>
+                            <field name="job_position_id" options="{'no_create': True}"/>
+                            <field name="source"/>
+                        </group>
+                        <group>
+                            <field name="auto_extract"/>
+                            <field name="auto_analyze_ats"/>
+                            <div class="alert alert-info" role="alert" invisible="not job_position_id">
+                                <strong>Auto-Filtering Enabled:</strong><br/>
+                                Candidates will be automatically approved/rejected based on job position criteria (experience and salary range).
+                            </div>
+                        </group>
+                    </group>
+                    <group string="CV Files to Upload">
+                        <div class="alert alert-info" role="alert">
+                            <strong>How to upload multiple CVs:</strong><br/>
+                            1. Click the attachment icon (📎) in the top right<br/>
+                            2. Upload multiple CV files (PDF, DOCX, or TXT)<br/>
+                            3. Select the uploaded files below<br/>
+                            4. Click "Upload &amp; Process All CVs"
+                        </div>
+                        <field name="cv_files" widget="many2many_binary" nolabel="1" options="{'no_create': True}"/>
+                    </group>
+                    <group string="Processing Results" invisible="not candidate_ids" col="4">
+                        <div class="oe_read_only">
+                            <label for="total_files" string="Total Files"/>
+                            <field name="total_files" readonly="1" nolabel="1"/>
+                        </div>
+                        <div class="oe_read_only">
+                            <label for="processed_count" string="Processed"/>
+                            <field name="processed_count" readonly="1" nolabel="1"/>
+                        </div>
+                        <div class="oe_read_only">
+                            <label for="success_count" string="Successful"/>
+                            <field name="success_count" readonly="1" nolabel="1" widget="statinfo"/>
+                        </div>
+                        <div class="oe_read_only">
+                            <label for="error_count" string="Errors"/>
+                            <field name="error_count" readonly="1" nolabel="1" widget="statinfo"/>
+                        </div>
+                    </group>
+                    <group string="Processing Log" invisible="not processing_log" col="1">
+                        <field name="processing_log" widget="text" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Bulk CV Upload Action -->
+    <record id="action_bulk_cv_upload_wizard" model="ir.actions.act_window">
+        <field name="name">Bulk CV Upload &amp; ATS Analysis</field>
+        <field name="res_model">bulk.cv.upload.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Upload Multiple CVs at Once!
+            </p>
+            <p>
+                Select multiple CV files to upload, extract data, and run ATS analysis automatically.
+            </p>
+        </field>
+    </record>
+
+    <!-- Add menu item -->
+    <menuitem id="menu_bulk_cv_upload"
+              name="Bulk CV Upload"
+              parent="menu_resume_candidates"
+              action="action_bulk_cv_upload_wizard"
+              sequence="25"/>
+</odoo>

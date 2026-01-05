@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Candidates - Techvoot HR{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>All Candidates</h1>
+        <a href="/dashboard" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="table-container">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4" style="width: 20%;">Name</th>
+                                <th style="width: 15%;">Phone</th>
+                                <th style="width: 20%;">Email</th>
+                                <th style="width: 15%;">Position</th>
+                                <th style="width: 10%;">Status</th>
+                                <th class="text-end pe-4" style="width: 10%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for candidate in candidates %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-3">{{ candidate.name[:1] }}</div>
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ candidate.name }}</div>
+                                            <small class="text-muted" style="font-size: 0.8rem;">ID: #{{ candidate.id
+                                                }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ candidate.phone }}</td>
+                                <td>{{ candidate.email or '-' }}</td>
+                                <td><span class="badge bg-soft-primary text-primary-custom">{{ candidate.job_title
+                                        }}</span></td>
+                                <td>
+                                    {% set status_color = 'warning' %}
+                                    {% if candidate.status == 'contacted' %}
+                                    {% set status_color = 'info' %}
+                                    {% elif candidate.status == 'qualified' %}
+                                    {% set status_color = 'success' %}
+                                    {% elif candidate.status in ['not_interested', 'rejected', 'failed', 'call_failed']
+                                    %}
+                                    {% set status_color = 'danger' %}
+                                    {% endif %}
+
+                                    <span class="badge bg-soft-{{ status_color }} text-{{ status_color }}">
+                                        {{ candidate.status|replace('_', ' ')|title }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="/call-script/{{ candidate.id }}" class="btn btn-sm btn-outline-secondary"
+                                        title="View Script">
+                                        <i class="fas fa-file-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-users mb-3" style="font-size: 2rem; opacity: 0.5;"></i>
+                                        <p>No candidates found.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

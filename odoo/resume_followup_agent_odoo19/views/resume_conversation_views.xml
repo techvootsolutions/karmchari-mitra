@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Conversation Tree View -->
+    <record id="view_resume_conversation_tree" model="ir.ui.view">
+        <field name="name">resume.conversation.tree</field>
+        <field name="model">resume.conversation</field>
+        <field name="arch" type="xml">
+            <list string="Conversations">
+                <field name="call_id"/>
+                <field name="timestamp" string="Call Date"/>
+                <field name="phone_number"/>
+                <field name="to_number"/>
+                <field name="bot_name"/>
+                <field name="candidate_name"/>
+                <field name="status" widget="badge" decoration-success="status=='completed'" decoration-warning="status=='in_progress'"/>
+                <field name="sentiment" widget="badge" decoration-success="sentiment=='positive'" decoration-info="sentiment=='neutral'" decoration-danger="sentiment=='negative'"/>
+                <field name="duration"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Conversation Form View -->
+    <record id="view_resume_conversation_form" model="ir.ui.view">
+        <field name="name">resume.conversation.form</field>
+        <field name="model">resume.conversation</field>
+        <field name="arch" type="xml">
+            <form string="Conversation">
+                <header>
+                    <button name="action_sync_call_data" string="Sync Call Data" type="object" 
+                            class="oe_highlight" 
+                            invisible="not call_id"
+                            help="Fetch latest call data from OmniDimension API"/>
+                    <field name="status" widget="statusbar" statusbar_visible="in_progress,completed"/>
+                </header>
+                <sheet>
+                    <!-- Conversation Section - Matching Google Sheet Structure Exactly -->
+                    <notebook>
+                        <page string="Conversation Data" name="conversation_data">
+                            <!-- Row matching Google Sheet columns A-S -->
+                            <group string="Call Identification" col="4">
+                                <field name="call_id" string="Call ID (A)"/>
+                                <field name="call_date" string="Call Date (B)" invisible="1"/>
+                                <field name="timestamp" string="Call Date (B)"/>
+                                <field name="phone_number" string="Phone Number (C)"/>
+                            </group>
+                            
+                            <group string="Call Details" col="4">
+                                <field name="call_request_id" string="Call Request ID (D)"/>
+                                <field name="bot_name" string="Bot Name (E)"/>
+                                <field name="to_number" string="To Number (F)"/>
+                                <field name="from_number" string="From Number (G)"/>
+                            </group>
+                            
+                            <group string="Recording &amp; Status" col="4">
+                                <field name="recording_url" string="Recording URL (H)" widget="url" 
+                                       invisible="not call_recording_url"/>
+                                <field name="call_recording_url" string="Recording URL (H)" widget="url" 
+                                       invisible="not call_recording_url"/>
+                                <field name="call_direction" string="Call Direction (I)"/>
+                                <field name="status" string="Call Status (J)"/>
+                            </group>
+                            
+                            <group string="Call Metadata" col="4">
+                                <field name="call_transfered" string="Call Transferred (K)"/>
+                                <field name="username" string="Username (S)"/>
+                                <field name="user_name" string="User Name"/>
+                                <field name="duration" string="Duration"/>
+                            </group>
+                            
+                            <group string="Additional Information" col="4">
+                                <field name="job_position" string="Job Position"/>
+                                <field name="interaction_count" string="Interaction Count"/>
+                                <field name="call_duration_in_minutes" string="Call Duration (Minutes)"/>
+                                <field name="call_duration_in_seconds" string="Call Duration (Seconds)"/>
+                            </group>
+                            
+                            <group string="Applicant Information">
+                                <field name="applicant_name" string="Applicant Name"/>
+                            </group>
+                            
+                            <separator string="Conversation Content (Matching Google Sheet Columns L-R)"/>
+                            
+                            <group string="Summary &amp; Sentiment" col="2">
+                                <field name="summary" widget="text" string="Summary (L)" 
+                                       placeholder="The conversation..." nolabel="0"/>
+                                <field name="sentiment" string="Sentiment (M)"/>
+                            </group>
+                            
+                            <group string="Collected Information from Conversation" col="2">
+                                <field name="brief_introduction" widget="text" string="Brief Introduction (N)" 
+                                       placeholder="Brief introduction from conversation..." nolabel="0"/>
+                                <field name="current_position" string="Current Position (O)" 
+                                       placeholder="Current position..."/>
+                            </group>
+                            
+                            <group string="Salary Information" col="2">
+                                <field name="current_salary" string="Current Salary (P)" 
+                                       placeholder="Current salary..."/>
+                                <field name="expected_salary" string="Expected Salary (Q)" 
+                                       placeholder="Expected salary..."/>
+                            </group>
+                            
+                            <group string="Notice Period">
+                                <field name="notice_period" string="Notice Period (R)" 
+                                       placeholder="Notice period..."/>
+                            </group>
+                        </page>
+                        
+                        <!-- Additional tabs for detailed view -->
+                        <page string="Call Information" name="call_info">
+                            <group>
+                                <group>
+                                    <field name="candidate_id" options="{'no_create': True}"/>
+                                    <field name="position"/>
+                                    <field name="agent_name"/>
+                                    <field name="company_name"/>
+                                    <field name="job_title"/>
+                                </group>
+                                <group>
+                                    <field name="call_id"/>
+                                    <field name="call_request_id"/>
+                                    <field name="call_sid"/>
+                                    <field name="bot_name"/>
+                                    <field name="username"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Phone Numbers">
+                                <group>
+                                    <field name="phone_number"/>
+                                    <field name="to_number"/>
+                                </group>
+                                <group>
+                                    <field name="from_number"/>
+                                    <field name="call_direction"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Call Status">
+                                <group>
+                                    <field name="status"/>
+                                    <field name="call_transfered"/>
+                                    <field name="duration"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Call Recording" invisible="not call_recording_url">
+                                <field name="call_recording_url" widget="url" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Transcript" name="transcript">
+                            <field name="transcript" widget="text" readonly="1" nolabel="1" 
+                                   placeholder="Full conversation transcript will appear here..."/>
+                            <separator string="Full Conversation"/>
+                            <field name="full_conversation" widget="text" readonly="1" nolabel="1" 
+                                   placeholder="Complete conversation details will appear here..."/>
+                        </page>
+                        
+                        <page string="AI Analysis" name="ai_analysis">
+                            <group>
+                                <group string="Scores">
+                                    <field name="communication_score"/>
+                                    <field name="sentiment_score"/>
+                                    <field name="clarity_score"/>
+                                    <field name="professionalism_score"/>
+                                </group>
+                                <group string="Levels">
+                                    <field name="engagement_level"/>
+                                    <field name="interest_level"/>
+                                    <field name="response_time_avg"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="ai_analysis" widget="text" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Notes" name="notes">
+                            <field name="notes" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Conversation Action -->
+    <record id="action_resume_conversation" model="ir.actions.act_window">
+        <field name="name">Conversations</field>
+        <field name="res_model">resume.conversation</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No conversations yet!
+            </p>
+            <p>
+                Start a conversation with a candidate to begin tracking follow-up calls.
+            </p>
+        </field>
+    </record>
+</odoo>

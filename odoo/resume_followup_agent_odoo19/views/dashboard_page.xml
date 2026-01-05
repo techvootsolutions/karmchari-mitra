@@ -1,0 +1,2302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="dashboard_page" name="Resume Follow-Up Dashboard">
+        <t t-call="website.layout">
+            <t t-set="title">Resume Follow-Up Dashboard</t>
+            <style>
+                /* Sidebar Menu Styles with Enhanced Hover Effects */
+                .dashboard-sidebar {
+                    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+                }
+                .dashboard-sidebar .menu-item {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    cursor: pointer;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .dashboard-sidebar .menu-item::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 3px;
+                    height: 100%;
+                    background: white;
+                    transform: scaleY(0);
+                    transition: transform 0.3s ease;
+                }
+                .dashboard-sidebar .menu-item:hover {
+                    background: rgba(255,255,255,0.25) !important;
+                    color: white !important;
+                    transform: translateX(5px);
+                    box-shadow: inset 0 0 20px rgba(255,255,255,0.1);
+                }
+                .dashboard-sidebar .menu-item:hover::before {
+                    transform: scaleY(1);
+                }
+                .dashboard-sidebar .menu-item:hover i {
+                    color: white !important;
+                    transform: scale(1.15);
+                    transition: transform 0.3s ease;
+                }
+                .dashboard-sidebar .menu-item.active {
+                    background: rgba(255,255,255,0.2) !important;
+                    color: white !important;
+                    border-left-color: white !important;
+                    box-shadow: inset 0 0 15px rgba(255,255,255,0.15);
+                }
+                .dashboard-sidebar .menu-item.active i {
+                    color: white !important;
+                }
+                .dashboard-sidebar .menu-item.active::before {
+                    transform: scaleY(1);
+                }
+                
+                /* Content Area Styles */
+                .dashboard-content-area {
+                    min-height: 100vh;
+                }
+                
+                .page-section {
+                    display: none;
+                }
+                
+                .page-section.active {
+                    display: block;
+                }
+                
+                /* Enhanced Global Hover Effects and Animations */
+                .dashboard-card {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    cursor: pointer;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .dashboard-card::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                    transition: left 0.5s ease;
+                }
+                .dashboard-card:hover::before {
+                    left: 100%;
+                }
+                .dashboard-card:hover {
+                    transform: translateY(-6px) scale(1.02);
+                    box-shadow: 0 12px 32px rgba(0,0,0,0.2) !important;
+                }
+                
+                .stat-card {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    cursor: pointer;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .stat-card::after {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 0;
+                    height: 0;
+                    border-radius: 50%;
+                    background: rgba(255,255,255,0.3);
+                    transform: translate(-50%, -50%);
+                    transition: width 0.6s ease, height 0.6s ease;
+                }
+                .stat-card:hover::after {
+                    width: 300px;
+                    height: 300px;
+                }
+                .stat-card:hover {
+                    transform: translateY(-8px) scale(1.03);
+                    box-shadow: 0 16px 40px rgba(102,126,234,0.35) !important;
+                    z-index: 10;
+                }
+                .stat-card:hover * {
+                    position: relative;
+                    z-index: 1;
+                }
+                .stat-card:hover .fa {
+                    transform: scale(1.2) rotate(5deg);
+                    transition: transform 0.3s ease;
+                }
+                
+                .sentiment-circle {
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    cursor: pointer;
+                    position: relative;
+                }
+                .sentiment-circle::before {
+                    content: '';
+                    position: absolute;
+                    top: -5px;
+                    left: -5px;
+                    right: -5px;
+                    bottom: -5px;
+                    border-radius: 50%;
+                    border: 3px solid rgba(255,255,255,0.5);
+                    opacity: 0;
+                    transform: scale(0.8);
+                    transition: all 0.4s ease;
+                }
+                .sentiment-circle:hover::before {
+                    opacity: 1;
+                    transform: scale(1.2);
+                }
+                .sentiment-circle:hover {
+                    transform: scale(1.15) rotate(5deg);
+                    box-shadow: 0 12px 30px rgba(0,0,0,0.3) !important;
+                    z-index: 10;
+                }
+                
+                .conversation-item {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    cursor: pointer;
+                    position: relative;
+                }
+                .conversation-item::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 4px;
+                    height: 100%;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    transform: scaleY(0);
+                    transition: transform 0.3s ease;
+                }
+                .conversation-item:hover::before {
+                    transform: scaleY(1);
+                }
+                .conversation-item:hover {
+                    transform: translateX(8px) translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(102,126,234,0.25) !important;
+                    border-color: #667eea !important;
+                    background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%) !important;
+                }
+                
+                .view-link {
+                    transition: all 0.3s ease;
+                    display: inline-block;
+                }
+                .view-link:hover {
+                    color: #764ba2 !important;
+                    text-decoration: underline !important;
+                    transform: translateX(5px) scale(1.05);
+                    text-shadow: 0 2px 4px rgba(118,75,162,0.2);
+                }
+                
+                .view-button {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    position: relative;
+                    overflow: hidden;
+                }
+                .view-button::before {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 0;
+                    height: 0;
+                    border-radius: 50%;
+                    background: rgba(102,126,234,0.3);
+                    transform: translate(-50%, -50%);
+                    transition: width 0.4s ease, height 0.4s ease;
+                }
+                .view-button:hover::before {
+                    width: 200px;
+                    height: 200px;
+                }
+                .view-button:hover {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                    color: white !important;
+                    transform: scale(1.08);
+                    box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+                }
+                .view-button:hover * {
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .salary-card {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    position: relative;
+                    cursor: pointer;
+                }
+                .salary-card::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(135deg, rgba(102,126,234,0.05) 0%, rgba(118,75,162,0.05) 100%);
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    border-radius: 12px;
+                }
+                .salary-card:hover::after {
+                    opacity: 1;
+                }
+                .salary-card:hover {
+                    background: #f0f4ff !important;
+                    transform: translateY(-4px) scale(1.02);
+                    box-shadow: 0 8px 20px rgba(102,126,234,0.2);
+                }
+                
+                /* Chart/Sentiment Section Hover */
+                .sentiment-chart-section {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    cursor: pointer;
+                }
+                .sentiment-chart-section:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 10px 28px rgba(0,0,0,0.15) !important;
+                }
+                
+                /* Salary Analysis Section Hover */
+                .salary-analysis-section {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    cursor: pointer;
+                }
+                .salary-analysis-section:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 10px 28px rgba(0,0,0,0.15) !important;
+                }
+                
+                /* Candidate Card Hover Effects */
+                .candidate-card {
+                    position: relative;
+                }
+                .candidate-card::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(135deg, rgba(102,126,234,0.03) 0%, rgba(118,75,162,0.03) 100%);
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    border-radius: 16px;
+                    pointer-events: none;
+                }
+                .candidate-card:hover::before {
+                    opacity: 1;
+                }
+                .candidate-card:hover {
+                    transform: translateY(-8px) scale(1.02);
+                    box-shadow: 0 12px 32px rgba(102,126,234,0.25) !important;
+                    border-color: #667eea !important;
+                }
+                .candidate-card:hover .candidate-menu {
+                    background: #f0f0f0;
+                }
+                .candidate-card:hover .candidate-menu i {
+                    color: #667eea;
+                }
+                
+                /* Add Candidate Button Hover */
+                .add-candidate-btn:hover {
+                    transform: translateY(-2px) scale(1.05);
+                    box-shadow: 0 8px 20px rgba(102,126,234,0.4) !important;
+                }
+                
+                /* Search Input Hover */
+                #candidate-search:hover,
+                #candidate-search:focus {
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+                }
+                
+                /* Filter Buttons Hover */
+                .view-toggle:hover {
+                    background: #f0f0f0 !important;
+                }
+                .view-toggle.active {
+                    background: #667eea !important;
+                    color: white !important;
+                }
+                
+                /* Filter Dropdown Hover */
+                .filter-btn:hover {
+                    background: #f8f9fa !important;
+                    border-color: #667eea !important;
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 8px rgba(102,126,234,0.15);
+                }
+                .filter-btn:hover i,
+                .filter-btn:hover span {
+                    color: #667eea !important;
+                }
+                
+                /* Candidates Grid Animation */
+                .candidates-grid {
+                    animation: fadeIn 0.5s ease-out;
+                }
+                
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                /* Conversation Card Hover Effects */
+                .conversation-card {
+                    position: relative;
+                }
+                .conversation-card::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(135deg, rgba(102,126,234,0.02) 0%, rgba(118,75,162,0.02) 100%);
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    border-radius: 12px;
+                    pointer-events: none;
+                }
+                .conversation-card:hover::before {
+                    opacity: 1;
+                }
+                .conversation-card:hover {
+                    transform: translateX(4px);
+                    box-shadow: 0 4px 12px rgba(102,126,234,0.15) !important;
+                    border-color: #667eea !important;
+                }
+                .conversation-card:hover .view-icon {
+                    background: #f0f0f0;
+                    transform: scale(1.1);
+                }
+                .conversation-card:hover .view-icon i {
+                    color: #764ba2;
+                }
+                
+                /* Search Input Hover for Conversations */
+                #conversation-search:hover,
+                #conversation-search:focus {
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+                }
+                
+                /* Agent Settings Page Styles - Enhanced Animations */
+                .create-default-questions-btn,
+                .edit-settings-btn {
+                    position: relative;
+                    overflow: hidden;
+                }
+                .create-default-questions-btn::before,
+                .edit-settings-btn::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                    transition: left 0.5s ease;
+                }
+                .create-default-questions-btn:hover::before,
+                .edit-settings-btn:hover::before {
+                    left: 100%;
+                }
+                .create-default-questions-btn:hover,
+                .edit-settings-btn:hover {
+                    transform: translateY(-3px) scale(1.05);
+                    box-shadow: 0 12px 28px rgba(102,126,234,0.5) !important;
+                    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+                }
+                .create-default-questions-btn:active,
+                .edit-settings-btn:active {
+                    transform: translateY(-1px) scale(1.02);
+                }
+                
+                /* Settings Section Cards - Enhanced Hover - ALL BOXES */
+                #page-agent-settings .page-section > div > div[style*="background: white"],
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"],
+                #page-agent-settings div[style*="background: white"][style*="border-radius: 16px"],
+                #page-agent-settings div[style*="background: #e3f2fd"][style*="border-radius"] {
+                    position: relative;
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    overflow: hidden;
+                    cursor: pointer;
+                }
+                #page-agent-settings .page-section > div > div[style*="background: white"]::before,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]::before,
+                #page-agent-settings div[style*="background: white"][style*="border-radius: 16px"]::before,
+                #page-agent-settings div[style*="background: #e3f2fd"][style*="border-radius"]::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 4px;
+                    background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+                    background-size: 200% 100%;
+                    transform: scaleX(0);
+                    transform-origin: left;
+                    transition: transform 0.4s ease;
+                    z-index: 1;
+                }
+                #page-agent-settings .page-section > div > div[style*="background: white"]::after,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]::after,
+                #page-agent-settings div[style*="background: white"][style*="border-radius: 16px"]::after,
+                #page-agent-settings div[style*="background: #e3f2fd"][style*="border-radius"]::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(135deg, rgba(102,126,234,0.05) 0%, rgba(118,75,162,0.05) 100%);
+                    opacity: 0;
+                    transition: opacity 0.4s ease;
+                    pointer-events: none;
+                    z-index: 0;
+                }
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover::before,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover::before,
+                #page-agent-settings div[style*="background: white"][style*="border-radius: 16px"]:hover::before,
+                #page-agent-settings div[style*="background: #e3f2fd"][style*="border-radius"]:hover::before {
+                    transform: scaleX(1);
+                    animation: gradientShift 2s ease infinite;
+                }
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover::after,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover::after,
+                #page-agent-settings div[style*="background: white"][style*="border-radius: 16px"]:hover::after,
+                #page-agent-settings div[style*="background: #e3f2fd"][style*="border-radius"]:hover::after {
+                    opacity: 1;
+                }
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover,
+                #page-agent-settings div[style*="background: white"][style*="border-radius: 16px"]:hover,
+                #page-agent-settings div[style*="background: #e3f2fd"][style*="border-radius"]:hover {
+                    box-shadow: 0 16px 40px rgba(102,126,234,0.35) !important;
+                    transform: translateY(-8px) scale(1.02);
+                    border-color: #667eea !important;
+                }
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover h2,
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover h3,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover h2,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover h3 {
+                    color: #667eea !important;
+                    transform: translateX(8px);
+                    text-shadow: 0 2px 12px rgba(102,126,234,0.4);
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover h2::after,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover h2::after {
+                    background: linear-gradient(90deg, #667eea, #764ba2);
+                    width: 100%;
+                }
+                /* Card Content Animation on Hover - ALL BOXES */
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover > div[style*="display: grid"],
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover > div[style*="display: grid"],
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover > div[style*="overflow-x: auto"],
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover > div[style*="overflow-x: auto"],
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover > ul,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover > ul {
+                    transform: translateX(6px);
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover label,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover label {
+                    color: #667eea !important;
+                    transform: translateX(6px);
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover div[style*="padding-top: 8px"],
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover div[style*="padding-top: 8px"] {
+                    color: #667eea !important;
+                    transform: translateX(6px);
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                }
+                /* Table inside boxes hover */
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover table,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover table,
+                #page-agent-settings div[style*="background: white"][style*="border-radius: 16px"]:hover table,
+                #page-agent-settings div[style*="background: #e3f2fd"][style*="border-radius"]:hover table {
+                    transform: translateX(4px);
+                    transition: all 0.3s ease;
+                }
+                /* Empty state message hover */
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover td[colspan],
+                #page-agent-settings div[style*="background: white"][style*="border-radius: 16px"]:hover td[colspan] {
+                    color: #667eea !important;
+                    transform: scale(1.02);
+                    transition: all 0.3s ease;
+                }
+                /* Add a line link hover */
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover a[style*="Add a line"],
+                #page-agent-settings div[style*="background: white"][style*="border-radius: 16px"]:hover a[style*="Add a line"] {
+                    color: #764ba2 !important;
+                    transform: translateX(6px);
+                    font-weight: 600;
+                    text-decoration: underline;
+                    transition: all 0.3s ease;
+                }
+                /* List items in instructions box */
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover li {
+                    color: #1976d2 !important;
+                    transform: translateX(8px);
+                    transition: all 0.3s ease;
+                }
+                /* Links inside boxes */
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover a,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover a {
+                    color: #764ba2 !important;
+                    transform: translateX(4px);
+                    transition: all 0.3s ease;
+                }
+                /* Icons inside boxes */
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover i,
+                #page-agent-settings .page-section > div > div[style*="background: #e3f2fd"]:hover i {
+                    transform: scale(1.1);
+                    transition: all 0.3s ease;
+                }
+                /* Checkbox icons inside boxes */
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover .fa-check-square,
+                #page-agent-settings .page-section > div > div[style*="background: white"]:hover .fa-square {
+                    transform: scale(1.2) rotate(5deg);
+                    color: #667eea !important;
+                }
+                
+                @keyframes gradientShift {
+                    0%, 100% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                }
+                
+                /* Question Table Row - Enhanced Hover */
+                .question-row {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    position: relative;
+                }
+                .question-row::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    width: 4px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    transform: scaleY(0);
+                    transform-origin: top;
+                    transition: transform 0.3s ease;
+                }
+                .question-row:hover::before {
+                    transform: scaleY(1);
+                }
+                .question-row:hover {
+                    background: linear-gradient(90deg, #f8f9ff 0%, #f8f9fa 100%) !important;
+                    transform: translateX(8px);
+                    box-shadow: -4px 0 12px rgba(102,126,234,0.15);
+                }
+                .question-row:hover td {
+                    color: #667eea !important;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                }
+                .question-row:hover td:first-child {
+                    font-weight: 600;
+                    color: #764ba2 !important;
+                }
+                
+                /* Labels and Text - Hover Effects */
+                #page-agent-settings label {
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings label:hover {
+                    color: #667eea !important;
+                    transform: translateX(4px);
+                    text-shadow: 0 0 8px rgba(102,126,234,0.3);
+                }
+                #page-agent-settings label span {
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings label:hover span {
+                    color: #764ba2 !important;
+                    transform: scale(1.2);
+                    display: inline-block;
+                }
+                
+                /* Value Text - Hover Effects */
+                #page-agent-settings div[style*="padding-top: 8px"] {
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings div[style*="padding-top: 8px"]:hover {
+                    color: #667eea !important;
+                    transform: translateX(4px);
+                    font-weight: 500;
+                }
+                
+                /* Icons - Animation */
+                #page-agent-settings .fa-check-square,
+                #page-agent-settings .fa-square,
+                #page-agent-settings .fa-cog {
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings .fa-check-square:hover,
+                #page-agent-settings .fa-square:hover {
+                    transform: scale(1.2) rotate(5deg);
+                    color: #28a745 !important;
+                }
+                #page-agent-settings .fa-cog:hover {
+                    transform: rotate(180deg) scale(1.1);
+                }
+                
+                /* Instructions Box - Enhanced */
+                #page-agent-settings div[style*="background: #e3f2fd"] {
+                    transition: all 0.3s ease;
+                    position: relative;
+                    overflow: hidden;
+                }
+                #page-agent-settings div[style*="background: #e3f2fd"]::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(102,126,234,0.1) 0%, transparent 70%);
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+                #page-agent-settings div[style*="background: #e3f2fd"]:hover::before {
+                    opacity: 1;
+                }
+                #page-agent-settings div[style*="background: #e3f2fd"]:hover {
+                    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%) !important;
+                    border-color: #667eea !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 16px rgba(102,126,234,0.2);
+                }
+                #page-agent-settings div[style*="background: #e3f2fd"]:hover h3 {
+                    color: #667eea;
+                    transform: translateX(4px);
+                }
+                #page-agent-settings div[style*="background: #e3f2fd"]:hover li {
+                    color: #1976d2;
+                    transform: translateX(4px);
+                    transition: all 0.3s ease;
+                }
+                
+                /* Add Line Link - Enhanced */
+                #page-agent-settings a[style*="color: #667eea"][style*="Add a line"] {
+                    position: relative;
+                    display: inline-block;
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings a[style*="color: #667eea"][style*="Add a line"]::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -2px;
+                    left: 0;
+                    width: 0;
+                    height: 2px;
+                    background: linear-gradient(90deg, #667eea, #764ba2);
+                    transition: width 0.3s ease;
+                }
+                #page-agent-settings a[style*="color: #667eea"][style*="Add a line"]:hover {
+                    color: #764ba2 !important;
+                    transform: translateX(4px);
+                    font-weight: 600;
+                }
+                #page-agent-settings a[style*="color: #667eea"][style*="Add a line"]:hover::after {
+                    width: 100%;
+                }
+                
+                /* Table Header - Enhanced */
+                #page-agent-settings thead tr {
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings thead tr:hover {
+                    background: linear-gradient(90deg, #f0f4ff 0%, #f8f9fa 100%) !important;
+                }
+                #page-agent-settings thead th {
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings thead th:hover {
+                    color: #667eea !important;
+                    transform: translateY(-2px);
+                    text-shadow: 0 2px 4px rgba(102,126,234,0.2);
+                }
+                
+                /* Empty State - Enhanced */
+                #page-agent-settings td[colspan="5"] {
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings td[colspan="5"]:hover {
+                    color: #667eea !important;
+                    transform: scale(1.02);
+                }
+                
+                /* Header Icon - Enhanced */
+                #page-agent-settings div[style*="width: 64px"][style*="height: 64px"] {
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                #page-agent-settings div[style*="width: 64px"][style*="height: 64px"]:hover {
+                    transform: rotate(360deg) scale(1.1);
+                    box-shadow: 0 8px 24px rgba(102,126,234,0.4);
+                }
+                
+                /* Section Headers - Enhanced */
+                #page-agent-settings h2 {
+                    transition: all 0.3s ease;
+                    position: relative;
+                }
+                #page-agent-settings h2::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -12px;
+                    left: 0;
+                    width: 0;
+                    height: 2px;
+                    background: linear-gradient(90deg, #667eea, #764ba2);
+                    transition: width 0.3s ease;
+                }
+                #page-agent-settings h2:hover::after {
+                    width: 100%;
+                }
+                
+                /* Grid Layout Items - Enhanced */
+                #page-agent-settings div[style*="display: grid"] > * {
+                    transition: all 0.3s ease;
+                }
+                #page-agent-settings div[style*="display: grid"] > label:hover + div,
+                #page-agent-settings div[style*="display: grid"] > div:hover {
+                    transform: translateX(8px);
+                }
+                
+                /* Telephony Config Page - Enhanced Animations */
+                .test-connection-btn,
+                .create-agent-btn,
+                .edit-telephony-btn {
+                    position: relative;
+                    overflow: hidden;
+                }
+                .test-connection-btn::before,
+                .create-agent-btn::before,
+                .edit-telephony-btn::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                    transition: left 0.5s ease;
+                }
+                .test-connection-btn:hover::before,
+                .create-agent-btn:hover::before,
+                .edit-telephony-btn:hover::before {
+                    left: 100%;
+                }
+                .test-connection-btn:hover,
+                .create-agent-btn:hover {
+                    transform: translateY(-3px) scale(1.05);
+                    box-shadow: 0 12px 28px rgba(102,126,234,0.5) !important;
+                    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+                }
+                .edit-telephony-btn:hover {
+                    transform: translateY(-3px) scale(1.05);
+                    box-shadow: 0 12px 28px rgba(160,85,255,0.5) !important;
+                    background: linear-gradient(135deg, #673AB7 0%, #A055FF 100%) !important;
+                }
+                .test-connection-btn:active,
+                .create-agent-btn:active,
+                .edit-telephony-btn:active {
+                    transform: translateY(-1px) scale(1.02);
+                }
+                
+                /* Telephony Cards - Enhanced Hover */
+                .telephony-card {
+                    position: relative;
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    overflow: hidden;
+                }
+                .telephony-card::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 4px;
+                    background: linear-gradient(90deg, #20C997, #17a085, #20C997);
+                    background-size: 200% 100%;
+                    transform: scaleX(0);
+                    transform-origin: left;
+                    transition: transform 0.4s ease;
+                }
+                .telephony-card:hover::before {
+                    transform: scaleX(1);
+                    animation: telephonyGradientShift 2s ease infinite;
+                }
+                .telephony-card:hover {
+                    box-shadow: 0 8px 24px rgba(32,201,151,0.25) !important;
+                    transform: translateY(-4px);
+                    border-color: #20C997 !important;
+                }
+                .telephony-card:hover h2 {
+                    color: #20C997;
+                    transform: translateX(4px);
+                    transition: all 0.3s ease;
+                }
+                
+                @keyframes telephonyGradientShift {
+                    0%, 100% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                }
+                
+                /* Field Groups - Enhanced */
+                .field-group {
+                    transition: all 0.3s ease;
+                }
+                .field-group:hover {
+                    transform: translateY(-2px);
+                }
+                .field-group:hover .field-label {
+                    color: #20C997 !important;
+                    transform: translateX(4px);
+                }
+                .field-group:hover .field-label i {
+                    color: #17a085 !important;
+                    transform: scale(1.2) rotate(15deg);
+                }
+                .field-group:hover .field-value {
+                    border-color: #20C997 !important;
+                    background: linear-gradient(135deg, #f0fdfa 0%, #f8f9fa 100%) !important;
+                    transform: translateX(4px);
+                    box-shadow: 0 2px 8px rgba(32,201,151,0.15);
+                }
+                
+                /* Field Labels - Enhanced */
+                .field-label {
+                    transition: all 0.3s ease;
+                }
+                .field-label i {
+                    transition: all 0.3s ease;
+                }
+                .field-label:hover {
+                    color: #20C997 !important;
+                    text-shadow: 0 0 8px rgba(32,201,151,0.3);
+                }
+                
+                /* Field Values - Enhanced */
+                .field-value {
+                    transition: all 0.3s ease;
+                }
+                .field-value:hover {
+                    color: #17a085 !important;
+                    font-weight: 500;
+                }
+                
+                /* Checkbox Icons - Enhanced */
+                #page-telephony-config .fa-check-square,
+                #page-telephony-config .fa-square {
+                    transition: all 0.3s ease;
+                }
+                #page-telephony-config .fa-check-square:hover,
+                #page-telephony-config .fa-square:hover {
+                    transform: scale(1.3) rotate(10deg);
+                    color: #20C997 !important;
+                }
+                
+                /* Header Icon - Enhanced */
+                #page-telephony-config div[style*="width: 64px"][style*="height: 64px"][style*="background: linear-gradient"] {
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                #page-telephony-config div[style*="width: 64px"][style*="height: 64px"][style*="background: linear-gradient"]:hover {
+                    transform: rotate(360deg) scale(1.15);
+                    box-shadow: 0 8px 24px rgba(32,201,151,0.4);
+                }
+                #page-telephony-config div[style*="width: 64px"][style*="height: 64px"][style*="background: linear-gradient"]:hover i {
+                    transform: scale(1.2);
+                }
+                
+                /* Section Headers - Enhanced */
+                #page-telephony-config h2 {
+                    transition: all 0.3s ease;
+                    position: relative;
+                }
+                #page-telephony-config h2::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -12px;
+                    left: 0;
+                    width: 0;
+                    height: 2px;
+                    background: linear-gradient(90deg, #20C997, #17a085);
+                    transition: width 0.3s ease;
+                }
+                #page-telephony-config h2:hover::after {
+                    width: 100%;
+                }
+                
+                /* Question Mark Icons - Enhanced */
+                .fa-question-circle {
+                    transition: all 0.3s ease;
+                }
+                .fa-question-circle:hover {
+                    color: #17a085 !important;
+                    transform: scale(1.3) rotate(15deg);
+                    text-shadow: 0 0 8px rgba(33,150,243,0.5);
+                }
+                
+                /* Action Buttons Icons - Enhanced */
+                .test-connection-btn:hover i,
+                .create-agent-btn:hover i,
+                .edit-telephony-btn:hover i {
+                    transform: scale(1.2) rotate(5deg);
+                }
+                
+                /* Smooth transitions for all interactive elements */
+                * {
+                    -webkit-tap-highlight-color: transparent;
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.7; }
+                }
+                .pulse-icon {
+                    animation: pulse 2s ease-in-out infinite;
+                }
+            </style>
+            <div class="oe_website_resume_dashboard" style="min-height: 100vh; background: #f8f9fa; display: flex;">
+                <!-- Left Sidebar Menu -->
+                <div class="dashboard-sidebar" style="width: 240px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; position: fixed; left: 0; top: 0; z-index: 1000; overflow-y: auto; box-shadow: 2px 0 8px rgba(0,0,0,0.1);">
+                    <!-- Brand Header -->
+                    <div style="padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                <i class="fa fa-users" style="font-size: 18px;"/>
+                            </div>
+                            <div>
+                                <div style="font-size: 16px; font-weight: 600; color: white; line-height: 1.2;">Resume</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.2; margin-top: 2px;">Follow-Up System</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- MAIN MENU Section -->
+                    <div style="padding: 12px 20px 8px 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.9);">
+                        MAIN MENU
+                    </div>
+                    
+                    <!-- Dashboard Menu Item -->
+                    <a href="#" class="menu-item active" data-page="dashboard" style="display: flex; align-items: center; padding: 12px 20px; color: white; text-decoration: none; transition: all 0.2s ease; background: rgba(255,255,255,0.15); border-left: 3px solid white;">
+                        <i class="fa fa-dashboard" style="width: 20px; margin-right: 12px; font-size: 16px; color: white;"/>
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 500;">Dashboard</div>
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px;">Analytics &amp; Overview</div>
+                        </div>
+                    </a>
+                    
+                    <!-- Candidates Menu Item -->
+                    <a href="#" class="menu-item" data-page="candidates" style="display: flex; align-items: center; padding: 12px 20px; color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.2s ease; border-left: 3px solid transparent;">
+                        <i class="fa fa-users" style="width: 20px; margin-right: 12px; font-size: 16px; color: rgba(255,255,255,0.9);"/>
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 400;">Candidates</div>
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px;">Manage Applicants</div>
+                        </div>
+                    </a>
+                    
+                    <!-- Conversations Menu Item -->
+                    <a href="#" class="menu-item" data-page="conversations" style="display: flex; align-items: center; padding: 12px 20px; color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.2s ease; border-left: 3px solid transparent;">
+                        <i class="fa fa-comments" style="width: 20px; margin-right: 12px; font-size: 16px; color: rgba(255,255,255,0.9);"/>
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 400;">Conversations</div>
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px;">Call History</div>
+                        </div>
+                    </a>
+                    
+                    <!-- CONFIGURATION Section -->
+                    <div style="padding: 12px 20px 8px 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.9); margin-top: 8px;">
+                        CONFIGURATION
+                    </div>
+                    
+                    <!-- Agent Settings Menu Item -->
+                    <a href="#" class="menu-item" data-page="agent-settings" style="display: flex; align-items: center; padding: 12px 20px; color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.2s ease; border-left: 3px solid transparent;">
+                        <i class="fa fa-cog" style="width: 20px; margin-right: 12px; font-size: 16px; color: rgba(255,255,255,0.9);"/>
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 400;">Agent Settings</div>
+                        </div>
+                    </a>
+                    
+                    <!-- Telephony Config Menu Item -->
+                    <a href="#" class="menu-item" data-page="telephony-config" style="display: flex; align-items: center; padding: 12px 20px; color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.2s ease; border-left: 3px solid transparent;">
+                        <i class="fa fa-phone" style="width: 20px; margin-right: 12px; font-size: 16px; color: rgba(255,255,255,0.9);"/>
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 400;">Telephony Config</div>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Main Content Area -->
+                <div class="dashboard-content-area" style="flex: 1; margin-left: 240px;">
+                    <!-- Dashboard Page -->
+                    <div id="page-dashboard" class="page-section active">
+                        <!-- Header -->
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; color: white; margin-bottom: 30px;">
+                            <div style="max-width: 1200px; margin: 0 auto;">
+                                <h1 style="color: white; margin: 0 0 10px 0; font-size: 32px; font-weight: bold;">
+                                    <i class="fa fa-dashboard"/> Resume Follow-Up Dashboard
+                                </h1>
+                                <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 16px;">
+                                    Comprehensive analytics and insights for your recruitment conversations
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px 40px;">
+                    <!-- Stats Grid -->
+                    <div class="row" style="margin-bottom: 30px;">
+                        <div class="col-md-3 col-sm-6" style="margin-bottom: 20px;">
+                            <div class="stat-card" onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_conversation'" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(102,126,234,0.3); min-height: 150px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <p style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;">Total Interviews</p>
+                                    <h2 style="margin: 0; font-size: 36px; font-weight: bold; color: white;">
+                                        <t t-esc="stats['total_interviews']"/>
+                                    </h2>
+                                    <p style="margin: 10px 0 0 0; font-size: 12px; opacity: 0.8;">All time</p>
+                                </div>
+                                <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-top: 15px;">
+                                    <i class="fa fa-comments" style="font-size: 24px; color: white;"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 col-sm-6" style="margin-bottom: 20px;">
+                            <div class="stat-card" onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_conversation&amp;search=Positive'" style="background: white; border: 1px solid #e0e0e0; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-height: 150px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">Positive Rate</p>
+                                    <h2 style="margin: 0; font-size: 36px; font-weight: bold; color: #2c3e50;">
+                                        <t t-esc="stats['positive_percentage']"/>%
+                                    </h2>
+                                    <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">Interview sentiment</p>
+                                    <p style="margin: 5px 0 0 0; font-size: 12px; color: #4CAF50; font-weight: 500;">
+                                        ↑ <t t-esc="stats['positive_percentage']"/>% positive
+                                    </p>
+                                </div>
+                                <div style="width: 48px; height: 48px; background: #f0f0f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-top: 15px;">
+                                    <i class="fa fa-arrow-up" style="font-size: 20px; color: #666;"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 col-sm-6" style="margin-bottom: 20px;">
+                            <div class="stat-card" onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_conversation'" style="background: white; border: 1px solid #e0e0e0; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-height: 150px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">Avg. Call Duration</p>
+                                    <h2 style="margin: 0; font-size: 36px; font-weight: bold; color: #2c3e50;">
+                                        <t t-esc="stats['avg_duration_display']"/>
+                                    </h2>
+                                    <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">Minutes per call</p>
+                                </div>
+                                <div style="width: 48px; height: 48px; background: #f0f0f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-top: 15px;">
+                                    <i class="fa fa-clock-o" style="font-size: 20px; color: #666;"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 col-sm-6" style="margin-bottom: 20px;">
+                            <div style="background: white; border: 1px solid #e0e0e0; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-height: 150px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">Active Candidates</p>
+                                    <h2 style="margin: 0; font-size: 36px; font-weight: bold; color: #2c3e50;">
+                                        <t t-esc="stats['active_candidates']"/>
+                                    </h2>
+                                    <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">In pipeline</p>
+                                    <p style="margin: 5px 0 0 0; font-size: 12px; color: #4CAF50; font-weight: 500;">
+                                        ↑ 12% increase
+                                    </p>
+                                </div>
+                                <div style="width: 48px; height: 48px; background: #f0f0f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-top: 15px;">
+                                    <i class="fa fa-users" style="font-size: 20px; color: #666;"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="row" style="margin-bottom: 30px;">
+                        <!-- Sentiment Chart -->
+                        <div class="col-md-6" style="margin-bottom: 20px;">
+                            <div class="sentiment-chart-section" style="background: white; border: 1px solid #e0e0e0; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50;">
+                                    Interview Sentiment Analysis
+                                </h3>
+                                <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
+                                    <div style="text-align: center; padding: 15px;">
+                                        <div class="sentiment-circle" onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_conversation&amp;search=Positive'" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; box-shadow: 0 4px 12px rgba(76,175,80,0.3);">
+                                            <div style="text-align: center; color: white;">
+                                                <div style="font-size: 32px; font-weight: bold;">
+                                                    <t t-esc="stats['positive_count']"/>
+                                                </div>
+                                                <div style="font-size: 14px; opacity: 0.9;">Positive</div>
+                                            </div>
+                                        </div>
+                                        <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: 600; color: #4CAF50;">
+                                            <t t-esc="stats['positive_percentage']"/>%
+                                        </p>
+                                    </div>
+                                    <div style="text-align: center; padding: 15px;">
+                                        <div class="sentiment-circle" onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_conversation&amp;search=Neutral'" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #FF9800 0%, #f57c00 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; box-shadow: 0 4px 12px rgba(255,152,0,0.3);">
+                                            <div style="text-align: center; color: white;">
+                                                <div style="font-size: 32px; font-weight: bold;">
+                                                    <t t-esc="stats['neutral_count']"/>
+                                                </div>
+                                                <div style="font-size: 14px; opacity: 0.9;">Neutral</div>
+                                            </div>
+                                        </div>
+                                        <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: 600; color: #FF9800;">
+                                            <t t-esc="stats['neutral_percentage']"/>%
+                                        </p>
+                                    </div>
+                                    <div style="text-align: center; padding: 15px;">
+                                        <div class="sentiment-circle" onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_conversation&amp;search=Negative'" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; box-shadow: 0 4px 12px rgba(244,67,54,0.3);">
+                                            <div style="text-align: center; color: white;">
+                                                <div style="font-size: 32px; font-weight: bold;">
+                                                    <t t-esc="stats['negative_count']"/>
+                                                </div>
+                                                <div style="font-size: 14px; opacity: 0.9;">Negative</div>
+                                            </div>
+                                        </div>
+                                        <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: 600; color: #f44336;">
+                                            <t t-esc="stats['negative_percentage']"/>%
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Salary Stats -->
+                        <div class="col-md-6" style="margin-bottom: 20px;">
+                            <div class="salary-analysis-section" style="background: white; border: 1px solid #e0e0e0; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                    <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #2c3e50;">
+                                        Salary Analysis
+                                    </h3>
+                                    <div style="padding: 6px 12px; border-radius: 20px; background: #f0f0f0; font-size: 12px; font-weight: 500; color: #667eea;">
+                                        <i class="fa fa-arrow-up" style="margin-right: 4px;"/>
+                                        <t t-if="stats['avg_expected_salary'] > 0 and stats['avg_current_salary'] > 0">
+                                            <t t-set="salary_gap" t-value="((stats['avg_expected_salary'] - stats['avg_current_salary']) / stats['avg_current_salary'] * 100)"/>
+                                            +<t t-esc="round(salary_gap, 1)"/>% expected increase
+                                        </t>
+                                    </div>
+                                </div>
+                                
+                                <div class="row" style="margin-bottom: 20px;">
+                                    <div class="col-md-6 salary-card" style="padding: 15px; background: #f8f9fa; border-radius: 12px; margin-bottom: 10px;">
+                                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                                <i class="fa fa-dollar" style="color: white; font-size: 14px;"/>
+                                            </div>
+                                            <span style="font-weight: 500; color: #2c3e50;">Current Salary</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                                            <span>Average</span>
+                                            <span style="float: right; font-weight: 600; color: #2c3e50;">
+                                                $<t t-esc="int(stats['avg_current_salary'])"/>
+                                            </span>
+                                        </div>
+                                        <div style="font-size: 12px; color: #666;">
+                                            <span>Range</span>
+                                            <span style="float: right; font-weight: 500; color: #2c3e50;">
+                                                $<t t-esc="int(stats['min_current_salary'])"/> - $<t t-esc="int(stats['max_current_salary'])"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 salary-card" style="padding: 15px; background: #f8f9fa; border-radius: 12px; margin-bottom: 10px;">
+                                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                                <i class="fa fa-arrow-up" style="color: white; font-size: 14px;"/>
+                                            </div>
+                                            <span style="font-weight: 500; color: #2c3e50;">Expected Salary</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                                            <span>Average</span>
+                                            <span style="float: right; font-weight: 600; color: #2c3e50;">
+                                                $<t t-esc="int(stats['avg_expected_salary'])"/>
+                                            </span>
+                                        </div>
+                                        <div style="font-size: 12px; color: #666;">
+                                            <span>Range</span>
+                                            <span style="float: right; font-weight: 500; color: #2c3e50;">
+                                                $<t t-esc="int(stats['min_expected_salary'])"/> - $<t t-esc="int(stats['max_expected_salary'])"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                                    <p style="margin: 0; font-size: 14px; color: #666;">
+                                        <i class="fa fa-info-circle" style="margin-right: 5px;"/>
+                                        View detailed salary charts in the Conversations → Graph view
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Conversations -->
+                    <div style="background: white; border: 1px solid #e0e0e0; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="margin: 0; font-size: 20px; font-weight: 600; color: #2c3e50;">
+                                Recent Conversations
+                            </h2>
+                            <a href="/web#action=resume_followup_agent_odoo19.action_resume_conversation" 
+                               class="view-link" style="font-size: 14px; font-weight: 500; color: #667eea; text-decoration: none;">
+                                View all →
+                            </a>
+                        </div>
+                        
+                        <div>
+                            <t t-foreach="stats['recent_conversations']" t-as="conv" t-key="conv_index">
+                                <div class="conversation-item" onclick="window.location.href='/web#id={conv.id}&amp;model=resume.conversation&amp;view_type=form'" style="display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 12px; margin-bottom: 12px; background: white;">
+                                    <div style="width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; flex-shrink: 0;">
+                                        <t t-esc="(conv.candidate_name or '?')[0]"/>
+                                    </div>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <h4 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 500; color: #2c3e50;">
+                                            <t t-esc="conv.candidate_name or 'Unknown'"/>
+                                        </h4>
+                                        <p style="margin: 0; font-size: 13px; color: #666;">
+                                            <t t-esc="conv.position or conv.phone_number or ''"/>
+                                        </p>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                        <t t-if="conv.sentiment == 'positive'">
+                                            <span style="padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; background: rgba(76,175,80,0.1); color: #4CAF50; border: 1px solid rgba(76,175,80,0.2);">
+                                                <t t-esc="conv.sentiment"/>
+                                            </span>
+                                        </t>
+                                        <t t-elif="conv.sentiment == 'negative'">
+                                            <span style="padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; background: rgba(244,67,54,0.1); color: #f44336; border: 1px solid rgba(244,67,54,0.2);">
+                                                <t t-esc="conv.sentiment"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span style="padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; background: rgba(255,152,0,0.1); color: #FF9800; border: 1px solid rgba(255,152,0,0.2);">
+                                                <t t-esc="conv.sentiment or 'neutral'"/>
+                                            </span>
+                                        </t>
+                                        <span style="font-size: 12px; color: #999;">
+                                            <i class="fa fa-clock-o" style="margin-right: 4px;"/>
+                                            <t t-esc="int(conv.duration or 0)"/> min
+                                        </span>
+                                        <a t-attf-href="/web#id=#{conv.id}&amp;model=resume.conversation&amp;view_type=form" 
+                                           class="view-button" onclick="event.stopPropagation();" style="padding: 6px 12px; background: #f0f0f0; border-radius: 8px; color: #667eea; text-decoration: none; font-size: 12px; font-weight: 500;">
+                                            <i class="fa fa-eye" style="margin-right: 4px;"/> View
+                                        </a>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                        
+                        <t t-if="not stats['recent_conversations']">
+                            <div style="text-align: center; padding: 40px; color: #999;">
+                                <p style="margin: 0;">No recent conversations found.</p>
+                            </div>
+                        </t>
+                    </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Candidates Page -->
+                    <div id="page-candidates" class="page-section">
+                        <div style="background: #f8f9fa; min-height: 100vh; padding: 30px 20px;">
+                            <div style="max-width: 1400px; margin: 0 auto;">
+                                <!-- Header -->
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                                    <div>
+                                        <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 700; color: #2c3e50;">Candidates</h1>
+                                        <p style="margin: 0; font-size: 16px; color: #666;">Manage and track your recruitment pipeline</p>
+                                    </div>
+                                    <a href="/web#action=resume_followup_agent_odoo19.action_resume_candidate&amp;view_type=form" 
+                                       class="add-candidate-btn" 
+                                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(102,126,234,0.3); transition: all 0.3s ease;">
+                                        <i class="fa fa-plus" style="font-size: 16px;"/> Add Candidate
+                                    </a>
+                                </div>
+                                
+                                <!-- Search and Filters -->
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                                    <div style="flex: 1; min-width: 300px; position: relative;">
+                                        <input type="text" 
+                                               id="candidate-search" 
+                                               placeholder="Search candidates..." 
+                                               style="width: 100%; padding: 12px 16px 12px 44px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 14px; outline: none; transition: all 0.3s ease;"/>
+                                        <i class="fa fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #999; font-size: 16px;"/>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="filter-btn" style="padding: 8px 12px; background: white; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
+                                            <i class="fa fa-filter" style="color: #666; margin-right: 6px;"/>
+                                            <span style="font-size: 14px; color: #666;">All...</span>
+                                        </div>
+                                        <div class="filter-btn" style="padding: 8px 12px; background: white; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
+                                            <span style="font-size: 14px; color: #666;">All Statuses</span>
+                                            <i class="fa fa-chevron-down" style="color: #666; margin-left: 6px; font-size: 12px;"/>
+                                        </div>
+                                        <div style="display: flex; background: white; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                                            <button class="view-toggle active" data-view="grid" style="padding: 8px 12px; border: none; background: #667eea; color: white; cursor: pointer; transition: all 0.2s ease;">
+                                                <i class="fa fa-th" style="font-size: 14px;"/>
+                                            </button>
+                                            <button class="view-toggle" data-view="list" style="padding: 8px 12px; border: none; background: transparent; color: #666; cursor: pointer; transition: all 0.2s ease; border-left: 1px solid #e0e0e0;">
+                                                <i class="fa fa-list" style="font-size: 14px;"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Candidate Count -->
+                                <div style="margin-bottom: 20px; color: #666; font-size: 14px;">
+                                    Showing <span id="candidate-count"><t t-esc="len(candidates)"/></span> of <t t-esc="len(candidates)"/> candidates
+                                </div>
+                                
+                                <!-- Candidates Grid -->
+                                <div id="candidates-grid" class="candidates-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+                                    <t t-foreach="candidates" t-as="candidate" t-key="candidate_index">
+                                        <t t-set="conv_count" t-value="len(candidate.conversation_ids)"/>
+                                        <t t-set="latest_conv" t-value="candidate.conversation_ids.sorted('create_date', reverse=True)[:1] if candidate.conversation_ids else []"/>
+                                        <t t-set="salary" t-value="latest_conv[0].expected_salary if latest_conv and latest_conv[0].expected_salary else (latest_conv[0].current_salary if latest_conv and latest_conv[0].current_salary else '')"/>
+                                        <t t-set="added_date" t-value="candidate.added_date.strftime('%b %d, %Y') if candidate.added_date else ''"/>
+                                        
+                                        <div class="candidate-card" 
+                                             t-att-data-candidate-id="candidate.id"
+                                             onclick="window.location.href='/web#id=' + this.getAttribute('data-candidate-id') + '&amp;model=resume.candidate&amp;view_type=form'"
+                                             style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; overflow: hidden;">
+                                            <!-- Context Menu -->
+                                            <div class="candidate-menu" onclick="event.stopPropagation();" style="position: absolute; top: 16px; right: 16px; padding: 8px; cursor: pointer; border-radius: 8px; transition: all 0.2s ease;">
+                                                <i class="fa fa-ellipsis-v" style="color: #999; font-size: 16px;"/>
+                                            </div>
+                                            
+                                            <!-- Candidate Header -->
+                                            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                                                <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 24px; flex-shrink: 0;">
+                                                    <t t-esc="(candidate.name or '?')[0].upper()"/>
+                                                </div>
+                                                <div style="flex: 1; min-width: 0;">
+                                                    <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 600; color: #2c3e50;">
+                                                        <t t-esc="candidate.name or 'Unknown'"/>
+                                                    </h3>
+                                                    <p style="margin: 0; font-size: 14px; color: #666;">
+                                                        <t t-esc="candidate.position or 'No position'"/>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Status Badge -->
+                                            <div style="margin-bottom: 16px;">
+                                                <t t-if="candidate.status == 'interviewed'">
+                                                    <span style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: #fff3cd; color: #856404;">
+                                                        Interviewed
+                                                    </span>
+                                                </t>
+                                                <t t-elif="candidate.status == 'contacted'">
+                                                    <span style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: #d4edda; color: #155724;">
+                                                        Contacted
+                                                    </span>
+                                                </t>
+                                                <t t-elif="candidate.status == 'pending'">
+                                                    <span style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: #d1ecf1; color: #0c5460;">
+                                                        Pending
+                                                    </span>
+                                                </t>
+                                                <t t-elif="candidate.status == 'hired'">
+                                                    <span style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: #28a745; color: white;">
+                                                        Hired
+                                                    </span>
+                                                </t>
+                                                <t t-elif="candidate.status == 'rejected'">
+                                                    <span style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: #f8d7da; color: #721c24;">
+                                                        Rejected
+                                                    </span>
+                                                </t>
+                                            </div>
+                                            
+                                            <!-- Contact Information -->
+                                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0;">
+                                                <t t-if="candidate.email">
+                                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #666; font-size: 13px;">
+                                                        <i class="fa fa-envelope" style="color: #999; font-size: 14px;"/>
+                                                        <span><t t-esc="candidate.email"/></span>
+                                                    </div>
+                                                </t>
+                                                <t t-if="candidate.phone">
+                                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #666; font-size: 13px;">
+                                                        <i class="fa fa-phone" style="color: #999; font-size: 14px;"/>
+                                                        <span><t t-esc="candidate.phone"/></span>
+                                                    </div>
+                                                </t>
+                                                <t t-if="candidate.linkedin">
+                                                    <div style="display: flex; align-items: center; gap: 8px; color: #666; font-size: 13px;">
+                                                        <i class="fa fa-linkedin" style="color: #999; font-size: 14px;"/>
+                                                        <a t-attf-href="https://#{candidate.linkedin}" target="_blank" onclick="event.stopPropagation();" style="color: #667eea; text-decoration: none;">
+                                                            <t t-esc="candidate.linkedin"/>
+                                                        </a>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                            
+                                            <!-- Metrics -->
+                                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                                                <div style="display: flex; align-items: center; gap: 6px; color: #666; font-size: 13px;">
+                                                    <i class="fa fa-comments" style="color: #999; font-size: 14px;"/>
+                                                    <span><t t-esc="conv_count"/> calls</span>
+                                                </div>
+                                                <t t-if="salary">
+                                                    <div style="display: flex; align-items: center; gap: 6px; color: #666; font-size: 13px;">
+                                                        <i class="fa fa-dollar" style="color: #999; font-size: 14px;"/>
+                                                        <span><t t-esc="salary"/></span>
+                                                    </div>
+                                                </t>
+                                                <t t-if="added_date">
+                                                    <div style="display: flex; align-items: center; gap: 6px; color: #666; font-size: 13px;">
+                                                        <i class="fa fa-calendar" style="color: #999; font-size: 14px;"/>
+                                                        <span><t t-esc="added_date"/></span>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                                
+                                <!-- Empty State -->
+                                <t t-if="not candidates">
+                                    <div style="text-align: center; padding: 60px 20px; color: #999;">
+                                        <i class="fa fa-users" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"/>
+                                        <p style="margin: 0; font-size: 16px;">No candidates found. Add your first candidate to get started.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Conversations Page -->
+                    <!-- Conversations Page -->
+                    <div id="page-conversations" class="page-section">
+                        <div style="background: #f8f9fa; min-height: 100vh; padding: 30px 20px;">
+                            <div style="max-width: 1400px; margin: 0 auto;">
+                                <!-- Header -->
+                                <div style="margin-bottom: 24px;">
+                                    <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 700; color: #2c3e50;">Conversations</h1>
+                                    <p style="margin: 0; font-size: 16px; color: #666;">View and manage all your recruitment call history</p>
+                                </div>
+                                
+                                <!-- Search and Filters -->
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                                    <div style="flex: 1; min-width: 300px; position: relative;">
+                                        <input type="text" 
+                                               id="conversation-search" 
+                                               placeholder="Search by name, call ID, or phone..." 
+                                               style="width: 100%; padding: 12px 16px 12px 44px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 14px; outline: none; transition: all 0.3s ease;"/>
+                                        <i class="fa fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #999; font-size: 16px;"/>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="filter-btn" style="padding: 8px 12px; background: white; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
+                                            <i class="fa fa-filter" style="color: #666; margin-right: 6px;"/>
+                                            <span style="font-size: 14px; color: #666;">All...</span>
+                                        </div>
+                                        <div class="filter-btn" style="padding: 8px 12px; background: white; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
+                                            <span style="font-size: 14px; color: #666;">All Statuses</span>
+                                            <i class="fa fa-chevron-down" style="color: #666; margin-left: 6px; font-size: 12px;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Conversation Count -->
+                                <div style="margin-bottom: 20px; color: #666; font-size: 14px;">
+                                    Showing <span id="conversation-count"><t t-esc="len(all_conversations)"/></span> conversations
+                                </div>
+                                
+                                <!-- Conversations List -->
+                                <div id="conversations-list">
+                                    <t t-foreach="conversations_grouped" t-as="date_group" t-key="date_group_index">
+                                        <t t-set="date" t-value="date_group[0]"/>
+                                        <t t-set="convs" t-value="date_group[1]"/>
+                                        
+                                        <!-- Date Header -->
+                                        <div style="display: flex; align-items: center; gap: 8px; margin: 30px 0 16px 0; padding-bottom: 12px; border-bottom: 2px solid #e0e0e0;">
+                                            <i class="fa fa-calendar" style="color: #667eea; font-size: 16px;"/>
+                                            <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">
+                                                <t t-esc="date.strftime('%A, %B %d, %Y')"/>
+                                            </h3>
+                                        </div>
+                                        
+                                        <!-- Conversations for this date -->
+                                        <t t-foreach="convs" t-as="conv" t-key="conv.id">
+                                            <t t-set="duration_minutes" t-value="int(conv.duration) if conv.duration else 0"/>
+                                            <t t-set="duration_seconds" t-value="int((conv.duration - duration_minutes) * 60) if conv.duration else 0"/>
+                                            <t t-set="duration_display" t-value="f'{duration_minutes}:{duration_seconds:02d}' if conv.duration else '0:00'"/>
+                                            <t t-set="time_display" t-value="conv.timestamp.strftime('%b %d, %H:%M') if conv.timestamp else ''"/>
+                                            
+                                            <div class="conversation-card" 
+                                                 t-att-data-conv-id="conv.id"
+                                                 onclick="window.location.href='/web#id=' + this.getAttribute('data-conv-id') + '&amp;model=resume.conversation&amp;view_type=form'"
+                                                 style="background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; display: flex; align-items: center; gap: 20px;">
+                                                
+                                                <!-- Left: Avatar and Name -->
+                                                <div style="display: flex; align-items: center; gap: 16px; flex: 0 0 auto;">
+                                                    <div style="width: 56px; height: 56px; border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 20px; flex-shrink: 0;">
+                                                        <t t-esc="(conv.candidate_name or '?')[0].upper()"/>
+                                                    </div>
+                                                    <div>
+                                                        <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">
+                                                            <t t-esc="conv.candidate_name or 'Unknown'"/>
+                                                        </h4>
+                                                        <p style="margin: 0; font-size: 13px; color: #666;">
+                                                            <t t-if="conv.position">
+                                                                <t t-esc="conv.position[:30] + ('...' if len(conv.position) > 30 else '')"/>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <t t-esc="conv.phone_number or ''"/>
+                                                            </t>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Middle: Call Details -->
+                                                <div style="display: flex; align-items: center; gap: 24px; flex: 1; flex-wrap: wrap;">
+                                                    <div style="display: flex; align-items: center; gap: 6px; color: #666; font-size: 13px;">
+                                                        <i class="fa fa-phone" style="color: #999; font-size: 14px;"/>
+                                                        <span style="font-weight: 500;">
+                                                            <t t-esc="conv.call_id or 'N/A'"/>
+                                                        </span>
+                                                    </div>
+                                                    <div style="display: flex; align-items: center; gap: 6px; color: #666; font-size: 13px;">
+                                                        <i class="fa fa-briefcase" style="color: #999; font-size: 14px;"/>
+                                                        <span>
+                                                            <t t-esc="conv.agent_name or 'HR Assistant'"/>
+                                                        </span>
+                                                    </div>
+                                                    <div style="display: flex; align-items: center; gap: 6px; color: #666; font-size: 13px;">
+                                                        <i class="fa fa-clock-o" style="color: #999; font-size: 14px;"/>
+                                                        <span>
+                                                            <t t-esc="duration_display"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Right: Status, Sentiment, Date, View -->
+                                                <div style="display: flex; align-items: center; gap: 12px; flex: 0 0 auto; flex-wrap: wrap;">
+                                                    <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; background: #d4edda; color: #155724;">
+                                                        Completed
+                                                    </span>
+                                                    <t t-if="conv.sentiment == 'positive'">
+                                                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; background: #d4edda; color: #155724;">
+                                                            <span>😊</span> Positive
+                                                        </span>
+                                                    </t>
+                                                    <t t-elif="conv.sentiment == 'neutral'">
+                                                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; background: #d1ecf1; color: #0c5460;">
+                                                            <span>😐</span> Neutral
+                                                        </span>
+                                                    </t>
+                                                    <t t-elif="conv.sentiment == 'negative'">
+                                                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; background: #f8d7da; color: #721c24;">
+                                                            <span>😞</span> Negative
+                                                        </span>
+                                                    </t>
+                                                    <span style="color: #666; font-size: 12px;">
+                                                        <t t-esc="time_display"/>
+                                                    </span>
+                                                    <div class="view-icon" onclick="event.stopPropagation(); window.location.href='/web#id=' + this.closest('.conversation-card').getAttribute('data-conv-id') + '&amp;model=resume.conversation&amp;view_type=form'" style="padding: 8px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                                                        <i class="fa fa-eye" style="color: #667eea; font-size: 16px;"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </t>
+                                    
+                                    <!-- Empty State -->
+                                    <t t-if="not all_conversations">
+                                        <div style="text-align: center; padding: 60px 20px; color: #999;">
+                                            <i class="fa fa-comments" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"/>
+                                            <p style="margin: 0; font-size: 16px;">No conversations found. Start making calls to see conversation history.</p>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Agent Settings Page -->
+                    <!-- Agent Settings Page -->
+                    <div id="page-agent-settings" class="page-section">
+                        <div style="background: #f8f9fa; min-height: 100vh; padding: 30px 20px;">
+                            <div style="max-width: 1400px; margin: 0 auto;">
+                                <!-- Header -->
+                                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 32px;">
+                                    <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa fa-cog" style="color: white; font-size: 32px;"/>
+                                    </div>
+                                    <div>
+                                        <h1 style="margin: 0 0 4px 0; font-size: 32px; font-weight: 700; color: #2c3e50;">Agent Settings</h1>
+                                        <p style="margin: 0; font-size: 16px; color: #666;">Configure your AI interview assistant</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Create Default Questions Button -->
+                                <div style="margin-bottom: 24px;">
+                                    <a t-att-data-agent-id="agent_settings.id"
+                                       class="create-default-questions-btn"
+                                       onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_agent_settings&amp;id=' + this.getAttribute('data-agent-id') + '&amp;view_type=form'"
+                                       style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(102,126,234,0.3); transition: all 0.3s ease; cursor: pointer;">
+                                        Create Default Questions
+                                    </a>
+                                </div>
+                                
+                                <!-- General Settings Section -->
+                                <div style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;">GENERAL SETTINGS</h2>
+                                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px 24px; align-items: start;">
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Agent Name <span style="color: #999;">?</span></label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="agent_settings.agent_name or 'Techvootbot'"/>
+                                        </div>
+                                        
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Company Name <span style="color: #999;">?</span></label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="agent_settings.company_name or 'Techvoot Solution'"/>
+                                        </div>
+                                        
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Default Job Title <span style="color: #999;">?</span></label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="agent_settings.default_job_title or 'WordPress Developer'"/>
+                                        </div>
+                                        
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Telephony Configuration <span style="color: #999;">?</span></label>
+                                        <div style="padding-top: 8px; color: #999;">
+                                            <t t-if="agent_settings.telephony_config_id">
+                                                <t t-esc="agent_settings.telephony_config_id.name"/>
+                                            </t>
+                                            <t t-else="">
+                                                (Not set)
+                                            </t>
+                                        </div>
+                                        
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Active</label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-if="agent_settings.active">
+                                                <i class="fa fa-check-square" style="color: #28a745; font-size: 18px;"/>
+                                            </t>
+                                            <t t-else="">
+                                                <i class="fa fa-square" style="color: #ccc; font-size: 18px;"/>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Conversation Settings Section -->
+                                <div style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;">CONVERSATION SETTINGS</h2>
+                                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px 24px; align-items: start;">
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Conversation Mode</label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="agent_settings.conversation_mode or 'text'"/>
+                                        </div>
+                                        
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Response Temperature <span style="color: #999;">?</span></label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="agent_settings.temperature or 0.70"/>
+                                        </div>
+                                        
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Max Conversation Length <span style="color: #999;">?</span></label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="agent_settings.max_conversation_length or 50"/>
+                                        </div>
+                                        
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Response Timeout (seconds) <span style="color: #999;">?</span></label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="agent_settings.response_timeout or 30"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Audio Settings Section -->
+                                <div style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;">AUDIO SETTINGS (FOR VOICE MODE)</h2>
+                                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px 24px; align-items: start;">
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Voice Gender</label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="(agent_settings.voice_gender or 'female').title()"/>
+                                        </div>
+                                        
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Audio Timeout (seconds) <span style="color: #999;">?</span></label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="agent_settings.audio_timeout or 5"/>
+                                        </div>
+                                        
+                                        <label style="font-weight: 500; color: #2c3e50; padding-top: 8px;">Silence Threshold (ms) <span style="color: #999;">?</span></label>
+                                        <div style="padding-top: 8px;">
+                                            <t t-esc="agent_settings.silence_threshold or 400"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Conversation Questions Section -->
+                                <div style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                    <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;">Conversation Questions</h2>
+                                    
+                                    <!-- Questions Table -->
+                                    <div style="overflow-x: auto;">
+                                        <table style="width: 100%; border-collapse: collapse;">
+                                            <thead>
+                                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #2c3e50; font-size: 13px;">Step Type</th>
+                                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #2c3e50; font-size: 13px;">Message/Question</th>
+                                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #2c3e50; font-size: 13px;">Collect Field</th>
+                                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #2c3e50; font-size: 13px;">Field Label</th>
+                                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #2c3e50; font-size: 13px;">Active</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-if="agent_settings.question_ids">
+                                                    <t t-foreach="agent_settings.question_ids.sorted('sequence')" t-as="question" t-key="question.id">
+                                                        <tr class="question-row" style="border-bottom: 1px solid #f0f0f0; transition: all 0.2s ease;">
+                                                            <td style="padding: 12px; font-size: 13px; color: #666;">
+                                                                <t t-esc="(question.step_type or '').title()"/>
+                                                            </td>
+                                                            <td style="padding: 12px; font-size: 13px; color: #666; max-width: 400px; word-wrap: break-word;">
+                                                                <t t-esc="question.message or ''"/>
+                                                            </td>
+                                                            <td style="padding: 12px; font-size: 13px; color: #666;">
+                                                                <t t-esc="question.collect_field or ''"/>
+                                                            </td>
+                                                            <td style="padding: 12px; font-size: 13px; color: #666;">
+                                                                <t t-esc="question.field_label or ''"/>
+                                                            </td>
+                                                            <td style="padding: 12px; font-size: 13px;">
+                                                                <t t-if="question.active">
+                                                                    <i class="fa fa-check-square" style="color: #28a745; font-size: 16px;"/>
+                                                                </t>
+                                                                <t t-else="">
+                                                                    <i class="fa fa-square" style="color: #ccc; font-size: 16px;"/>
+                                                                </t>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </t>
+                                                <t t-else="">
+                                                    <tr>
+                                                        <td colspan="5" style="padding: 40px; text-align: center; color: #999; font-size: 14px;">
+                                                            No questions configured. Click "Create Default Questions" to get started.
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- Add Line Link -->
+                                    <div style="margin-top: 16px;">
+                                        <a t-att-data-agent-id="agent_settings.id"
+                                           onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_agent_settings&amp;id=' + this.getAttribute('data-agent-id') + '&amp;view_type=form'"
+                                           style="color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s ease; cursor: pointer;">
+                                            Add a line
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Instructions Box -->
+                                <div style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #1976d2;">Instructions:</h3>
+                                    <ul style="margin: 0; padding-left: 20px; color: #1565c0; font-size: 14px; line-height: 1.8;">
+                                        <li>Drag rows to reorder questions</li>
+                                        <li>Use placeholders: {candidate_name}, {agent_name}, {company_name}, {job_title}</li>
+                                        <li>Set <strong>collect_field</strong> to store the response (e.g., "introduction", "current_position")</li>
+                                        <li>Set <strong>field_label</strong> for a human-readable label</li>
+                                        <li>Step types: greeting, purpose, explanation, question, closing</li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Edit Button -->
+                                <div style="text-align: right; margin-top: 24px;">
+                                    <a t-att-data-agent-id="agent_settings.id"
+                                       class="edit-settings-btn"
+                                       onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_agent_settings&amp;id=' + this.getAttribute('data-agent-id') + '&amp;view_type=form'"
+                                       style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(102,126,234,0.3); transition: all 0.3s ease; cursor: pointer;">
+                                        Edit Settings
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Telephony Config Page -->
+                    <!-- Telephony Config Page -->
+                    <div id="page-telephony-config" class="page-section">
+                        <div style="background: #f8f9fa; min-height: 100vh; padding: 30px 20px;">
+                            <div style="max-width: 1400px; margin: 0 auto;">
+                                <!-- Header -->
+                                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 32px;">
+                                    <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #20C997 0%, #17a085 100%); display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa fa-phone" style="color: white; font-size: 32px;"/>
+                                    </div>
+                                    <div>
+                                        <h1 style="margin: 0 0 4px 0; font-size: 32px; font-weight: 700; color: #2c3e50;">Telephony Configuration</h1>
+                                        <p style="margin: 0; font-size: 16px; color: #666;">
+                                            <t t-if="telephony_config">
+                                                <t t-esc="telephony_config.provider_name or 'omnidimension_ai'"/>
+                                            </t>
+                                            <t t-else="">
+                                                Configure your phone system integration
+                                            </t>
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                                    <a t-att-data-config-id="telephony_config.id if telephony_config else ''"
+                                       class="test-connection-btn"
+                                       onclick="if(this.getAttribute('data-config-id')) { window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_telephony_config&amp;id=' + this.getAttribute('data-config-id') + '&amp;view_type=form'; } else { window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_telephony_config&amp;view_type=form'; }"
+                                       style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(102,126,234,0.3); transition: all 0.3s ease; cursor: pointer;">
+                                        <i class="fa fa-exclamation-circle" style="font-size: 16px;"/>
+                                        Test Connection
+                                    </a>
+                                    <a t-att-data-config-id="telephony_config.id if telephony_config else ''"
+                                       class="create-agent-btn"
+                                       onclick="if(this.getAttribute('data-config-id')) { window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_telephony_config&amp;id=' + this.getAttribute('data-config-id') + '&amp;view_type=form'; } else { window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_telephony_config&amp;view_type=form'; }"
+                                       style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(102,126,234,0.3); transition: all 0.3s ease; cursor: pointer;">
+                                        <i class="fa fa-user-plus" style="font-size: 16px;"/>
+                                        Create Agent
+                                    </a>
+                                </div>
+                                
+                                <t t-if="telephony_config">
+                                    <!-- Provider Settings Section -->
+                                    <div class="telephony-card" style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                        <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;">PROVIDER SETTINGS</h2>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; align-items: start;">
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Telephony Provider
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="(telephony_config.provider_name or 'omnidimension_ai').replace('_', ' ').title()"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Account SID / API Key
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px; font-family: monospace;">
+                                                    <t t-if="telephony_config.account_sid">
+                                                        <t t-esc="'*' * min(len(telephony_config.account_sid), 20)"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        (Not set)
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- OmniDimension AI Settings Section -->
+                                    <div class="telephony-card" style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                        <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;">OMNIDIMENSION AI SETTINGS</h2>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; align-items: start;">
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    API Endpoint
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="telephony_config.api_endpoint or 'https://api.omnidim.io/api/v1'"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Agent ID
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="telephony_config.agent_id or '(Not set)'"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Voice ID
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="telephony_config.voice_id or 'google'"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Agent Creation Settings Section -->
+                                    <div class="telephony-card" style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                        <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;">AGENT CREATION SETTINGS</h2>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; align-items: start;">
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Agent Name
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="telephony_config.agent_name or 'Resume Follow-Up Agent'"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Agent Model
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="(telephony_config.agent_model or 'gpt-4.1-mini').replace('-', ' ').replace('.', '.').title()"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group" style="grid-column: 1 / -1;">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Welcome Message
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px; min-height: 60px; white-space: pre-wrap;">
+                                                    <t t-esc="telephony_config.welcome_message or 'Hi [user_name], this is [Techvootbot] from [Techvoot Solution] calling to follow up on your resume submission for the [job Title] developer position.'"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Agent Temperature
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="telephony_config.agent_temperature or 0.70"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Transcriber Provider
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="telephony_config.transcriber_provider or 'Azure'"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Silence Timeout (ms)
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="telephony_config.silence_timeout_ms or 400"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- AI Configuration Section -->
+                                    <div class="telephony-card" style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                        <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;">AI CONFIGURATION</h2>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; align-items: start;">
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Use AI Agent for Calls
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px;">
+                                                    <t t-if="telephony_config.use_ai_agent">
+                                                        <i class="fa fa-check-square" style="color: #667eea; font-size: 20px;"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <i class="fa fa-square" style="color: #ccc; font-size: 20px;"/>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    AI Model
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="(telephony_config.ai_model or 'openai').replace('_', ' ').title()"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    AI API Key
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px; font-family: monospace;">
+                                                    <t t-if="telephony_config.ai_api_key">
+                                                        <t t-esc="'*' * min(len(telephony_config.ai_api_key), 20)"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        (Not set)
+                                                    </t>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    AI Endpoint
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="telephony_config.ai_endpoint or '(Not set)'"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Call Settings Section -->
+                                    <div class="telephony-card" style="background: white; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                        <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #2c3e50; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;">CALL SETTINGS</h2>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; align-items: start;">
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Max Call Duration (minutes)
+                                                    <i class="fa fa-question-circle" style="color: #2196F3; margin-left: 4px; font-size: 14px; cursor: help;"/>
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; color: #2c3e50; font-size: 14px;">
+                                                    <t t-esc="telephony_config.max_call_duration or 30"/>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Enable Call Recording
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px;">
+                                                    <t t-if="telephony_config.enable_call_recording">
+                                                        <i class="fa fa-check-square" style="color: #667eea; font-size: 20px;"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <i class="fa fa-square" style="color: #ccc; font-size: 20px;"/>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Enable Sentiment Analysis
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px;">
+                                                    <t t-if="telephony_config.enable_sentiment_analysis">
+                                                        <i class="fa fa-check-square" style="color: #667eea; font-size: 20px;"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <i class="fa fa-square" style="color: #ccc; font-size: 20px;"/>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label" style="display: block; font-weight: 500; color: #2c3e50; margin-bottom: 8px;">
+                                                    Active
+                                                </label>
+                                                <div class="field-value" style="padding: 10px 14px;">
+                                                    <t t-if="telephony_config.active">
+                                                        <i class="fa fa-check-square" style="color: #667eea; font-size: 20px;"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <i class="fa fa-square" style="color: #ccc; font-size: 20px;"/>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Edit Button -->
+                                    <div style="text-align: right; margin-top: 24px;">
+                                        <a t-att-data-config-id="telephony_config.id"
+                                           class="edit-telephony-btn"
+                                           onclick="window.location.href='/web#action=resume_followup_agent_odoo19.action_resume_telephony_config&amp;id=' + this.getAttribute('data-config-id') + '&amp;view_type=form'"
+                                           style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #A055FF 0%, #673AB7 100%); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(160,85,255,0.3); transition: all 0.3s ease; cursor: pointer;">
+                                            <i class="fa fa-save" style="font-size: 16px;"/>
+                                            Save Configuration
+                                        </a>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div style="text-align: center; padding: 60px 20px; color: #999;">
+                                        <i class="fa fa-phone" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"/>
+                                        <p style="margin: 0; font-size: 16px;">No telephony configuration found. Create one to get started.</p>
+                                        <a href="/web#action=resume_followup_agent_odoo19.action_resume_telephony_config&amp;view_type=form" 
+                                           style="display: inline-block; margin-top: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
+                                            Create Configuration
+                                        </a>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;">
+                <script>
+                    // Menu Navigation Handler
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Handle menu item clicks
+                        var menuItems = document.querySelectorAll('.dashboard-sidebar .menu-item');
+                        menuItems.forEach(function(item) {
+                            item.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                
+                                // Remove active class from all menu items
+                                menuItems.forEach(function(mi) {
+                                    mi.classList.remove('active');
+                                });
+                                
+                                // Add active class to clicked item
+                                this.classList.add('active');
+                                
+                                // Hide all page sections
+                                var pages = document.querySelectorAll('.page-section');
+                                pages.forEach(function(page) {
+                                    page.classList.remove('active');
+                                });
+                                
+                                // Show selected page
+                                var pageId = this.getAttribute('data-page');
+                                if (pageId) {
+                                    var targetPage = document.getElementById('page-' + pageId);
+                                    if (targetPage) {
+                                        targetPage.classList.add('active');
+                                    }
+                                }
+                            });
+                        });
+                        
+                        // Add click handlers for better UX
+                        var cards = document.querySelectorAll('.stat-card, .sentiment-circle, .conversation-item');
+                        cards.forEach(function(card) {
+                            card.addEventListener('mouseenter', function() {
+                                this.style.cursor = 'pointer';
+                            });
+                        });
+                        
+                        // Add tooltip on hover for sentiment circles
+                        var sentimentCircles = document.querySelectorAll('.sentiment-circle');
+                        sentimentCircles.forEach(function(circle) {
+                            circle.addEventListener('mouseenter', function(e) {
+                                var tooltip = document.createElement('div');
+                                tooltip.className = 'sentiment-tooltip';
+                                tooltip.style.cssText = 'position: absolute; background: rgba(0,0,0,0.8); color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; pointer-events: none; z-index: 1000; margin-top: -40px;';
+                                tooltip.textContent = 'Click to view ' + (this.textContent.match(/Positive|Neutral|Negative/)[0] || '') + ' interviews';
+                                this.appendChild(tooltip);
+                            });
+                            circle.addEventListener('mouseleave', function() {
+                                var tooltip = this.querySelector('.sentiment-tooltip');
+                                if (tooltip) tooltip.remove();
+                            });
+                    });
+                    
+                    // Candidates page search functionality
+                    var candidateSearch = document.getElementById('candidate-search');
+                    if (candidateSearch) {
+                        candidateSearch.addEventListener('input', function() {
+                            var searchTerm = this.value.toLowerCase();
+                            var cards = document.querySelectorAll('.candidate-card');
+                            var visibleCount = 0;
+                            
+                            cards.forEach(function(card) {
+                                var name = card.querySelector('h3').textContent.toLowerCase();
+                                var position = card.querySelector('p').textContent.toLowerCase();
+                                var email = '';
+                                var emailEl = card.querySelector('.fa-envelope');
+                                if (emailEl &amp;&amp; emailEl.parentElement) {
+                                    email = emailEl.parentElement.textContent.toLowerCase();
+                                }
+                                
+                                if (name.includes(searchTerm) || position.includes(searchTerm) || email.includes(searchTerm)) {
+                                    card.style.display = 'block';
+                                    visibleCount++;
+                                } else {
+                                    card.style.display = 'none';
+                                }
+                            });
+                            
+                            var countEl = document.getElementById('candidate-count');
+                            if (countEl) {
+                                countEl.textContent = visibleCount;
+                            }
+                        });
+                    }
+                    
+                    // View toggle functionality
+                    var viewToggles = document.querySelectorAll('.view-toggle');
+                    viewToggles.forEach(function(toggle) {
+                        toggle.addEventListener('click', function() {
+                            viewToggles.forEach(function(t) {
+                                t.classList.remove('active');
+                                if (t.getAttribute('data-view') === 'grid') {
+                                    t.style.background = 'transparent';
+                                    t.style.color = '#666';
+                                } else {
+                                    t.style.background = 'transparent';
+                                    t.style.color = '#666';
+                                }
+                            });
+                            
+                            this.classList.add('active');
+                            this.style.background = '#667eea';
+                            this.style.color = 'white';
+                            
+                            var view = this.getAttribute('data-view');
+                            var grid = document.getElementById('candidates-grid');
+                            if (grid) {
+                                if (view === 'list') {
+                                    grid.style.gridTemplateColumns = '1fr';
+                                } else {
+                                    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(320px, 1fr))';
+                                }
+                            }
+                        });
+                    });
+                    
+                    // Conversations page search functionality
+                    var conversationSearch = document.getElementById('conversation-search');
+                    if (conversationSearch) {
+                        conversationSearch.addEventListener('input', function() {
+                            var searchTerm = this.value.toLowerCase();
+                            var cards = document.querySelectorAll('.conversation-card');
+                            var visibleCount = 0;
+                            
+                            cards.forEach(function(card) {
+                                var name = card.querySelector('h4').textContent.toLowerCase();
+                                var callId = '';
+                                var callIdEl = card.querySelector('.fa-phone');
+                                if (callIdEl &amp;&amp; callIdEl.parentElement) {
+                                    callId = callIdEl.parentElement.textContent.toLowerCase();
+                                }
+                                var phone = '';
+                                var phoneEl = card.querySelector('p');
+                                if (phoneEl) {
+                                    phone = phoneEl.textContent.toLowerCase();
+                                }
+                                
+                                if (name.includes(searchTerm) || callId.includes(searchTerm) || phone.includes(searchTerm)) {
+                                    card.style.display = 'flex';
+                                    visibleCount++;
+                                } else {
+                                    card.style.display = 'none';
+                                }
+                            });
+                            
+                            var countEl = document.getElementById('conversation-count');
+                            if (countEl) {
+                                countEl.textContent = visibleCount;
+                            }
+                        });
+                    }
+                });
+            </script>
+            </div>
+        </t>
+    </template>
+</odoo>

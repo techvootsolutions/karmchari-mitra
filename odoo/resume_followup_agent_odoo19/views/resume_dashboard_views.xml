@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard Action - Opens directly to Graph View -->
+    <record id="action_resume_dashboard" model="ir.actions.act_window">
+        <field name="name">📊 Resume Follow-Up Dashboard</field>
+        <field name="res_model">resume.conversation</field>
+        <field name="view_mode">graph,pivot,list,form</field>
+        <field name="domain">[('status', '=', 'completed')]</field>
+        <field name="context">{'search_default_group_by_sentiment': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Dashboard Analytics
+            </p>
+            <p>
+                View sentiment analysis and salary statistics using Odoo's native graph and pivot views.
+                Switch between Graph, Pivot, List, and Form views using the view switcher.
+            </p>
+        </field>
+    </record>
+
+    <!-- Sentiment Analysis Graph View (Pie Chart) -->
+    <record id="view_resume_conversation_graph_sentiment" model="ir.ui.view">
+        <field name="name">resume.conversation.graph.sentiment</field>
+        <field name="model">resume.conversation</field>
+        <field name="arch" type="xml">
+            <graph string="Interview Sentiment Analysis" type="pie" sample="1">
+                <field name="sentiment" type="row"/>
+                <field name="id" type="measure" string="Count"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Salary Analysis Graph View (Bar Chart) -->
+    <record id="view_resume_conversation_graph_salary" model="ir.ui.view">
+        <field name="name">resume.conversation.graph.salary</field>
+        <field name="model">resume.conversation</field>
+        <field name="arch" type="xml">
+            <graph string="Salary Analysis by Sentiment" type="bar" sample="1">
+                <field name="sentiment" type="row"/>
+                <field name="current_salary" type="measure" string="Current Salary"/>
+                <field name="expected_salary" type="measure" string="Expected Salary"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Main Graph View - Default for Dashboard -->
+    <record id="view_resume_conversation_graph" model="ir.ui.view">
+        <field name="name">resume.conversation.graph</field>
+        <field name="model">resume.conversation</field>
+        <field name="arch" type="xml">
+            <graph string="Conversation Analytics" type="bar" sample="1">
+                <field name="sentiment" type="row"/>
+                <field name="id" type="measure" string="Number of Interviews"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Pivot View for Sentiment Analysis -->
+    <record id="view_resume_conversation_pivot" model="ir.ui.view">
+        <field name="name">resume.conversation.pivot</field>
+        <field name="model">resume.conversation</field>
+        <field name="arch" type="xml">
+            <pivot string="Interview Sentiment Analysis" sample="1">
+                <field name="sentiment" type="row"/>
+                <field name="timestamp" type="col" interval="month"/>
+                <field name="id" type="measure" string="Count"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Enhanced List View for Conversations -->
+    <record id="view_resume_conversation_tree" model="ir.ui.view">
+        <field name="name">resume.conversation.tree</field>
+        <field name="model">resume.conversation</field>
+        <field name="arch" type="xml">
+            <list string="Conversations" sample="1">
+                <field name="call_id"/>
+                <field name="timestamp" string="Call Date"/>
+                <field name="candidate_name"/>
+                <field name="phone_number"/>
+                <field name="bot_name"/>
+                <field name="status" widget="badge" 
+                       decoration-success="status=='completed'" 
+                       decoration-warning="status=='in_progress'"
+                       decoration-danger="status=='cancelled'"/>
+                <field name="sentiment" widget="badge" 
+                       decoration-success="sentiment=='positive'" 
+                       decoration-info="sentiment=='neutral'" 
+                       decoration-danger="sentiment=='negative'"/>
+                <field name="current_salary"/>
+                <field name="expected_salary"/>
+                <field name="duration"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Enhanced Form View for Conversations -->
+    <record id="view_resume_conversation_form" model="ir.ui.view">
+        <field name="name">resume.conversation.form</field>
+        <field name="model">resume.conversation</field>
+        <field name="arch" type="xml">
+            <form string="Conversation">
+                <header>
+                    <button name="action_sync_call_data" string="Sync Call Data" type="object" 
+                            class="oe_highlight" 
+                            invisible="not call_id"
+                            help="Fetch latest call data from OmniDimension API"/>
+                    <field name="status" widget="statusbar" statusbar_visible="in_progress,completed"/>
+                </header>
+                <sheet>
+                    <!-- Conversation Section - Matching Google Sheet Structure -->
+                    <notebook>
+                        <page string="Conversation Data" name="conversation_data">
+                            <group string="Call Identification" col="4">
+                                <field name="call_id" string="Call ID"/>
+                                <field name="timestamp" string="Call Date"/>
+                                <field name="phone_number" string="Phone Number"/>
+                                <field name="call_request_id" string="Call Request ID"/>
+                            </group>
+                            
+                            <group string="Call Details" col="4">
+                                <field name="bot_name" string="Bot Name"/>
+                                <field name="to_number" string="To Number"/>
+                                <field name="from_number" string="From Number"/>
+                                <field name="call_direction" string="Call Direction"/>
+                            </group>
+                            
+                            <group string="Recording &amp; Status" col="4">
+                                <field name="recording_url" string="Recording URL" widget="url" 
+                                       invisible="not call_recording_url"/>
+                                <field name="call_recording_url" string="Recording URL" widget="url" 
+                                       invisible="not call_recording_url"/>
+                                <field name="status" string="Call Status"/>
+                                <field name="call_transfered" string="Call Transferred"/>
+                            </group>
+                            
+                            <group string="Additional Information" col="4">
+                                <field name="username" string="Username"/>
+                                <field name="user_name" string="User Name"/>
+                                <field name="job_position" string="Job Position"/>
+                                <field name="interaction_count" string="Interaction Count"/>
+                            </group>
+                            
+                            <group string="Call Duration" col="3">
+                                <field name="duration" string="Duration (Minutes)"/>
+                                <field name="call_duration_in_minutes" string="Duration (Minutes)"/>
+                                <field name="call_duration_in_seconds" string="Duration (Seconds)"/>
+                            </group>
+                            
+                            <separator string="Conversation Content"/>
+                            
+                            <group string="Summary &amp; Sentiment" col="2">
+                                <field name="summary" widget="text" string="Summary" 
+                                       placeholder="The conversation..." nolabel="0"/>
+                                <field name="sentiment" string="Sentiment"/>
+                            </group>
+                            
+                            <group string="Collected Information" col="2">
+                                <field name="brief_introduction" widget="text" string="Brief Introduction" 
+                                       placeholder="Brief introduction..." nolabel="0"/>
+                                <field name="current_position" string="Current Position"/>
+                            </group>
+                            
+                            <group string="Salary Information" col="2">
+                                <field name="current_salary" string="Current Salary"/>
+                                <field name="expected_salary" string="Expected Salary"/>
+                            </group>
+                            
+                            <group string="Notice Period">
+                                <field name="notice_period" string="Notice Period"/>
+                            </group>
+                            
+                            <group string="Applicant Information">
+                                <field name="applicant_name" string="Applicant Name"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Call Information" name="call_info">
+                            <group>
+                                <group>
+                                    <field name="candidate_id" options="{'no_create': True}"/>
+                                    <field name="position"/>
+                                    <field name="agent_name"/>
+                                    <field name="company_name"/>
+                                    <field name="job_title"/>
+                                </group>
+                                <group>
+                                    <field name="call_id"/>
+                                    <field name="call_request_id"/>
+                                    <field name="call_sid"/>
+                                    <field name="bot_name"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Phone Numbers">
+                                <group>
+                                    <field name="phone_number"/>
+                                    <field name="to_number"/>
+                                </group>
+                                <group>
+                                    <field name="from_number"/>
+                                    <field name="call_direction"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Call Status">
+                                <group>
+                                    <field name="status"/>
+                                    <field name="call_transfered"/>
+                                    <field name="duration"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Call Recording" invisible="not call_recording_url">
+                                <field name="call_recording_url" widget="url" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Transcript" name="transcript">
+                            <field name="transcript" widget="text" readonly="1" nolabel="1" 
+                                   placeholder="Full conversation transcript will appear here..."/>
+                            <separator string="Full Conversation"/>
+                            <field name="full_conversation" widget="text" readonly="1" nolabel="1" 
+                                   placeholder="Complete conversation details will appear here..."/>
+                        </page>
+                        
+                        <page string="AI Analysis" name="ai_analysis">
+                            <group>
+                                <group string="Scores">
+                                    <field name="communication_score"/>
+                                    <field name="sentiment_score"/>
+                                    <field name="clarity_score"/>
+                                    <field name="professionalism_score"/>
+                                </group>
+                                <group string="Levels">
+                                    <field name="engagement_level"/>
+                                    <field name="interest_level"/>
+                                    <field name="response_time_avg"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="ai_analysis" widget="text" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Notes" name="notes">
+                            <field name="notes" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Conversation Action -->
+    <record id="action_resume_conversation" model="ir.actions.act_window">
+        <field name="name">Conversations</field>
+        <field name="res_model">resume.conversation</field>
+        <field name="view_mode">list,form,graph,pivot</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No conversations yet!
+            </p>
+            <p>
+                Start a conversation with a candidate to begin tracking follow-up calls.
+            </p>
+        </field>
+    </record>
+
+    <!-- Separate Action for Salary Graph View -->
+    <record id="action_resume_conversation_salary_graph" model="ir.actions.act_window">
+        <field name="name">Salary Analysis</field>
+        <field name="res_model">resume.conversation</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_resume_conversation_graph_salary"/>
+        <field name="domain">[('status', '=', 'completed'), ('current_salary', '!=', False)]</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

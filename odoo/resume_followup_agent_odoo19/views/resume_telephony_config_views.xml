@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Telephony Configuration Form View -->
+    <record id="view_resume_telephony_config_form" model="ir.ui.view">
+        <field name="name">resume.telephony.config.form</field>
+        <field name="model">resume.telephony.config</field>
+        <field name="arch" type="xml">
+            <form string="Telephony Configuration">
+                <header>
+                    <button name="action_test_connection" string="Test Connection" type="object" 
+                            class="oe_highlight" 
+                            invisible="provider_name != 'omnidimension_ai'"
+                            help="Test if the API endpoint is reachable and correct"/>
+                    <button name="action_create_agent" string="Create Agent" type="object" 
+                            class="btn-primary" 
+                            invisible="provider_name != 'omnidimension_ai'"
+                            help="Create a new OmniDimension AI agent using the configured settings"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Provider Settings">
+                            <field name="provider_name"/>
+                            <field name="account_sid" password="True" 
+                                   required="provider_name != False"/>
+                            <field name="auth_token" password="True" 
+                                   invisible="provider_name == 'omnidimension_ai'"
+                                   required="provider_name != 'omnidimension_ai' and provider_name != False"/>
+                            <field name="phone_number" 
+                                   invisible="provider_name == 'omnidimension_ai'"
+                                   required="provider_name != 'omnidimension_ai' and provider_name != False"/>
+                        </group>
+                        <group string="OmniDimension AI Settings" 
+                               invisible="provider_name != 'omnidimension_ai'">
+                            <field name="api_endpoint" 
+                                   placeholder="https://api.omnidim.io/api/v1"
+                                   help="Enter the API endpoint URL from your OmniDimension AI dashboard. Default: https://api.omnidim.io/api/v1"/>
+                            <field name="agent_id" 
+                                   placeholder="e.g., 74720"
+                                   help="Your Agent ID from OmniDimension AI dashboard (will be auto-filled after creating an agent)"/>
+                            <field name="voice_id" 
+                                   placeholder="e.g., manisha"
+                                   help="Your Voice ID from OmniDimension AI dashboard (e.g., manisha for Sarvam provider)"/>
+                        </group>
+                    </group>
+                    <group string="Agent Creation Settings" 
+                           invisible="provider_name != 'omnidimension_ai'">
+                        <group>
+                            <field name="agent_name" 
+                                   placeholder="Resume Follow-Up Agent"
+                                   help="Name for the OmniDimension AI agent"/>
+                            <field name="welcome_message" 
+                                   widget="text"
+                                   placeholder="Hi [user_name], this is [Techvootbot] from [Techvoot Solution]..."
+                                   help="Welcome message template. Use placeholders: [user_name], [agent_name], [company_name], [job Title]"/>
+                        </group>
+                        <group>
+                            <field name="agent_model" 
+                                   help="AI model to use for the agent"/>
+                            <field name="agent_temperature" 
+                                   help="Temperature setting (0.0 to 1.0). Higher = more creative, Lower = more focused"/>
+                            <field name="transcriber_provider" 
+                                   help="Speech-to-text provider"/>
+                            <field name="silence_timeout_ms" 
+                                   help="Silence timeout in milliseconds for the transcriber"/>
+                        </group>
+                    </group>
+                    <group string="AI Configuration">
+                        <group>
+                            <field name="use_ai_agent"/>
+                            <field name="ai_model"/>
+                            <field name="ai_api_key" password="True"/>
+                            <field name="ai_endpoint"/>
+                        </group>
+                    </group>
+                    <group string="Call Settings">
+                        <group>
+                            <field name="max_call_duration"/>
+                            <field name="enable_call_recording"/>
+                            <field name="enable_sentiment_analysis"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Telephony Configuration Tree View -->
+    <record id="view_resume_telephony_config_tree" model="ir.ui.view">
+        <field name="name">resume.telephony.config.tree</field>
+        <field name="model">resume.telephony.config</field>
+        <field name="arch" type="xml">
+            <list string="Telephony Configurations">
+                <field name="provider_name"/>
+                <field name="use_ai_agent"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Telephony Configuration Action -->
+    <record id="action_resume_telephony_config" model="ir.actions.act_window">
+        <field name="name">Telephony Configuration</field>
+        <field name="res_model">resume.telephony.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Call Script - {{ candidate.name }}{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Call Script</h1>
+        <div class="actions">
+            <a href="/dashboard" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print"></i> Print Script
+            </button>
+        </div>
+    </div>
+
+    <div
+        style="background: white; padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+        <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+            <h2 style="color: var(--primary);">{{ candidate.name }}</h2>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">
+                <i class="fas fa-briefcase"></i> {{ candidate.job_title }} &nbsp;|&nbsp;
+                <i class="fas fa-phone"></i> {{ candidate.phone }}
+            </p>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 2rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <pre
+                style="white-space: pre-wrap; font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.6; color: var(--text-main);">{{ script }}</pre>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <button onclick="callCandidate({{ candidate.id }})" class="btn btn-primary btn-lg">
+                <i class="fas fa-phone"></i> Initiate Call Now
+            </button>
+        </div>
+    </div>
+
+    {% if transcript %}
+    <div style="margin-top: 3rem;">
+        <h3 style="margin-bottom: 1rem; color: var(--dark);">Previous Conversation Transcript</h3>
+        <div
+            style="background: #f8f9fa; padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+            <pre
+                style="white-space: pre-wrap; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ transcript }}</pre>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    async function callCandidate(candidateId) {
+        if (!confirm('Are you sure you want to call ' + '{{ candidate.name }}' + '?')) return;
+
+        try {
+            const response = await fetch('/api/make_call', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ candidate_id: candidateId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('Call initiated!');
+                window.location.href = '/dashboard';
+            } else {
+                alert('Failed: ' + data.error);
+            }
+        } catch (e) {
+            alert('Error: ' + e);
+        }
+    }
+</script>
+{% endblock %}

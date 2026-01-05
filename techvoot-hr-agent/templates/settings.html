@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Techvoot HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h4 class="fw-bold font-outfit text-dark m-0">System Settings</h4>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="/settings/rules" class="btn btn-primary shadow-sm">
+                <i class="fas fa-list-check me-2"></i> Manage Hiring Rules
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-lg-6 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold m-0 font-outfit text-primary"><i class="fas fa-robot me-2"></i> Agent
+                        Configuration</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small text-uppercase text-muted fw-bold">Agent Name</label>
+                        <input type="text" class="form-control" value="Resume Follow-Up Agent" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-uppercase text-muted fw-bold">Agent ID</label>
+                        <input type="text" class="form-control" value="74835">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-uppercase text-muted fw-bold">Voice Provider</label>
+                        <input type="text" class="form-control" value="Sarvam (Anushka)" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-uppercase text-muted fw-bold">LLM Model</label>
+                        <input type="text" class="form-control" value="gpt-4.1-mini" readonly>
+                    </div>
+
+                    <div class="alert alert-light border mt-4 mb-0">
+                        <div class="d-flex">
+                            <i class="fas fa-info-circle text-primary mt-1 me-3"></i>
+                            <div>
+                                <small class="text-muted">Settings are currently managed via <code>config.py</code> and
+                                    environment variables. To make changes, please contact the administrator.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Job Position List View -->
+    <record id="view_job_position_tree" model="ir.ui.view">
+        <field name="name">job.position.tree</field>
+        <field name="model">job.position</field>
+        <field name="arch" type="xml">
+            <list string="Job Positions" decoration-info="state=='draft'" decoration-success="state=='open'" decoration-muted="state=='closed'">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="positions_to_fill"/>
+                <field name="positions_filled"/>
+                <field name="positions_remaining"/>
+                <field name="min_experience_years"/>
+                <field name="max_experience_years"/>
+                <field name="min_salary" optional="hide"/>
+                <field name="max_salary" optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state=='open'" decoration-info="state=='draft'" decoration-muted="state=='closed'" decoration-danger="state=='cancelled'"/>
+                <field name="candidate_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Job Position Form View -->
+    <record id="view_job_position_form" model="ir.ui.view">
+        <field name="name">job.position.form</field>
+        <field name="model">job.position</field>
+        <field name="arch" type="xml">
+            <form string="Job Position">
+                <header>
+                    <button name="action_open" string="Open Position" type="object" class="oe_highlight" invisible="state != 'draft'" icon="fa-check"/>
+                    <button name="action_close" string="Close Position" type="object" invisible="state != 'open'" icon="fa-times"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ['closed', 'cancelled']" icon="fa-ban"/>
+                    <button name="action_auto_filter_candidates" string="Auto-Filter Candidates" type="object" class="oe_highlight" invisible="state != 'open'" icon="fa-filter"/>
+                    <button name="action_view_candidates" string="View Candidates" type="object" icon="fa-users"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_candidates" type="object" class="oe_stat_button" icon="fa-users">
+                            <field name="candidate_count" widget="statinfo" string="Total Candidates"/>
+                        </button>
+                        <button name="action_view_candidates" type="object" class="oe_stat_button" icon="fa-check-circle" context="{'search_default_status': 'hired'}">
+                            <field name="approved_candidates" widget="statinfo" string="Approved"/>
+                        </button>
+                        <button name="action_view_candidates" type="object" class="oe_stat_button" icon="fa-times-circle" context="{'search_default_status': 'rejected'}">
+                            <field name="rejected_candidates" widget="statinfo" string="Rejected"/>
+                        </button>
+                        <button name="action_view_candidates" type="object" class="oe_stat_button" icon="fa-clock-o" context="{'search_default_status': 'pending'}">
+                            <field name="pending_candidates" widget="statinfo" string="Pending"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="positions_to_fill"/>
+                            <field name="positions_filled" readonly="1"/>
+                            <field name="positions_remaining" readonly="1"/>
+                            <field name="date_open"/>
+                            <field name="date_close"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Hiring Criteria" name="criteria">
+                            <group>
+                                <group string="Experience Requirements">
+                                    <field name="min_experience_years"/>
+                                    <field name="max_experience_years" placeholder="No maximum (leave empty)"/>
+                                    <div class="alert alert-info" role="alert" style="margin-top: 10px;">
+                                        <strong>Experience Range:</strong><br/>
+                                        Candidates with experience between <field name="min_experience_years" readonly="1" nolabel="1"/> 
+                                        <span invisible="not max_experience_years">and <field name="max_experience_years" readonly="1" nolabel="1"/></span>
+                                        <span invisible="max_experience_years">and above</span> years will be considered.
+                                    </div>
+                                </group>
+                                <group string="Salary Requirements">
+                                    <field name="min_salary" placeholder="No minimum (leave empty)"/>
+                                    <field name="max_salary" placeholder="No maximum (leave empty)"/>
+                                    <field name="salary_currency"/>
+                                    <div class="alert alert-info" role="alert" style="margin-top: 10px;" invisible="not min_salary and not max_salary">
+                                        <strong>Salary Range:</strong><br/>
+                                        <span invisible="not min_salary">Minimum: <field name="min_salary" readonly="1" nolabel="1"/> <field name="salary_currency" readonly="1" nolabel="1"/><br/></span>
+                                        <span invisible="not max_salary">Maximum: <field name="max_salary" readonly="1" nolabel="1"/> <field name="salary_currency" readonly="1" nolabel="1"/></span>
+                                        <span invisible="min_salary or max_salary">No salary requirements set</span>
+                                    </div>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Auto-Filtering Settings">
+                                    <field name="auto_approve_matching"/>
+                                    <field name="auto_reject_non_matching"/>
+                                    <div class="alert alert-warning" role="alert" style="margin-top: 10px;">
+                                        <strong>Auto-Filtering:</strong><br/>
+                                        When enabled, candidates will be automatically approved or rejected based on experience AND salary matching (if salary is required).
+                                        Use the "Auto-Filter Candidates" button to apply these rules to existing candidates.
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Job Description" name="description">
+                            <field name="description" widget="text" nolabel="1"/>
+                        </page>
+                        <page string="Candidates" name="candidates">
+                            <field name="candidate_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="email"/>
+                                    <field name="phone"/>
+                                    <field name="years_of_experience"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="ats_overall_score" widget="statinfo" string="ATS Score"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Job Position Kanban View -->
+    <record id="view_job_position_kanban" model="ir.ui.view">
+        <field name="name">job.position.kanban</field>
+        <field name="model">job.position</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="state"/>
+                <field name="positions_to_fill"/>
+                <field name="positions_filled"/>
+                <field name="positions_remaining"/>
+                <field name="candidate_count"/>
+                <progressbar field="state" colors='{"open": "success", "draft": "warning", "closed": "muted"}'/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div>
+                                        <span>Positions: </span>
+                                        <strong><field name="positions_filled"/>/<field name="positions_to_fill"/></strong>
+                                    </div>
+                                    <div>
+                                        <span>Experience: </span>
+                                        <field name="min_experience_years"/> - <field name="max_experience_years" invisible="not max_experience_years"/>
+                                        <span invisible="max_experience_years">+ years</span>
+                                    </div>
+                                    <div>
+                                        <span>Candidates: </span>
+                                        <strong><field name="candidate_count"/></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Job Position Action -->
+    <record id="action_job_position" model="ir.actions.act_window">
+        <field name="name">Job Positions</field>
+        <field name="res_model">job.position</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first job position!
+            </p>
+            <p>
+                Define job positions with hiring criteria including experience requirements.
+                The system will automatically filter candidates based on these criteria.
+            </p>
+        </field>
+    </record>
+</odoo>

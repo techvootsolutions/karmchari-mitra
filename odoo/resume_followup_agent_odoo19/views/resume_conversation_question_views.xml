@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Conversation Question Tree View -->
+    <record id="view_resume_conversation_question_tree" model="ir.ui.view">
+        <field name="name">resume.conversation.question.tree</field>
+        <field name="model">resume.conversation.question</field>
+        <field name="arch" type="xml">
+            <list string="Questions" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="step_type"/>
+                <field name="message" widget="text"/>
+                <field name="collect_field"/>
+                <field name="field_label"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Conversation Question Form View -->
+    <record id="view_resume_conversation_question_form" model="ir.ui.view">
+        <field name="name">resume.conversation.question.form</field>
+        <field name="model">resume.conversation.question</field>
+        <field name="arch" type="xml">
+            <form string="Conversation Question">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="agent_settings_id" invisible="1"/>
+                            <field name="sequence"/>
+                            <field name="step_type"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="collect_field" placeholder="e.g., introduction, current_position"/>
+                            <field name="field_label" placeholder="e.g., Introduction, Current Position"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="message" widget="text" 
+                               placeholder="Enter the message or question. Use {candidate_name}, {agent_name}, {company_name}, {job_title} as placeholders."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Conversation Question Action -->
+    <record id="action_resume_conversation_question" model="ir.actions.act_window">
+        <field name="name">Conversation Questions</field>
+        <field name="res_model">resume.conversation.question</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_agent_settings_id': active_id}</field>
+    </record>
+</odoo>

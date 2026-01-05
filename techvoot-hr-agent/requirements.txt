@@ -1,0 +1,16 @@
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.2
+Flask-WTF==1.1.1
+python-dotenv==1.0.0
+pyautogui==0.9.54
+twilio==8.9.0
+schedule==1.2.0
+pandas==2.0.3
+openpyxl==3.1.2
+omnidimension
+gspread
+oauth2client
+PyPDF2
+python-docx
+Werkzeug==2.3.7

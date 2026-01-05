@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Techvoot HR Agent{% endblock %}
+
+{% block auth_content %}
+<div
+    style="min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 2rem;">
+
+    <div style="max-width: 600px;">
+        <h1 class="font-outfit" style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-color);">
+            Techvoot HR Agent
+        </h1>
+        <p style="font-size: 1.25rem; color: var(--text-muted); margin-bottom: 2rem;">
+            Automate your candidate follow-ups with intelligent AI voice agents.
+            Streamline your recruitment process today.
+        </p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="/auth/login" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                <i class="fas fa-sign-in-alt me-2"></i> Login to Dashboard
+            </a>
+            <a href="https://techvoot.com" target="_blank" class="btn btn-secondary"
+                style="padding: 1rem 2rem; font-size: 1.1rem;">
+                Learn More
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="row g-4 mt-4 w-100 justify-content-center" style="max-width: 900px;">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 p-4 text-start">
+                <i class="fas fa-robot text-primary mb-3" style="font-size: 2rem;"></i>
+                <h5 class="fw-bold font-outfit">AI Automation</h5>
+                <p class="text-muted small">Intelligent voice agents that handle initial screenings automatically.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 p-4 text-start">
+                <i class="fas fa-chart-line text-success mb-3" style="font-size: 2rem;"></i>
+                <h5 class="fw-bold font-outfit">Real-time Analytics</h5>
+                <p class="text-muted small">Track call outcomes, durations, and candidate responses instantly.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 p-4 text-start">
+                <i class="fas fa-users text-warning mb-3" style="font-size: 2rem;"></i>
+                <h5 class="fw-bold font-outfit">Candidate Management</h5>
+                <p class="text-muted small">Centralized dashboard to manage and track all your recruitment leads.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

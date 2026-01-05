@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Agent Settings Form View -->
+    <record id="view_resume_agent_settings_form" model="ir.ui.view">
+        <field name="name">resume.agent.settings.form</field>
+        <field name="model">resume.agent.settings</field>
+        <field name="arch" type="xml">
+            <form string="Agent Settings">
+                <header>
+                    <button name="create_default_questions" string="Create Default Questions" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="General Settings">
+                            <field name="agent_name"/>
+                            <field name="company_name"/>
+                            <field name="default_job_title"/>
+                            <field name="telephony_config_id" 
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   help="Select telephony configuration for AI-powered calls"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Conversation Settings">
+                            <field name="conversation_mode"/>
+                            <field name="temperature" widget="float"/>
+                            <field name="max_conversation_length"/>
+                            <field name="response_timeout"/>
+                        </group>
+                    </group>
+                    <group string="Audio Settings (for Voice Mode)">
+                        <group>
+                            <field name="voice_gender"/>
+                            <field name="audio_timeout"/>
+                        </group>
+                        <group>
+                            <field name="silence_threshold"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Conversation Questions" name="questions">
+                            <field name="question_ids" nolabel="1">
+                                <list string="Questions" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="step_type"/>
+                                    <field name="message" widget="text"/>
+                                    <field name="collect_field" placeholder="e.g., introduction"/>
+                                    <field name="field_label" placeholder="e.g., Introduction"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                            <div class="alert alert-info" role="alert">
+                                <p><strong>Instructions:</strong></p>
+                                <ul>
+                                    <li>Drag rows to reorder questions</li>
+                                    <li>Use placeholders: {candidate_name}, {agent_name}, {company_name}, {job_title}</li>
+                                    <li>Set <strong>collect_field</strong> to store the response (e.g., "introduction", "current_position")</li>
+                                    <li>Set <strong>field_label</strong> for a human-readable label</li>
+                                    <li>Step types: greeting, purpose, explanation, question, closing</li>
+                                </ul>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Agent Settings Tree View -->
+    <record id="view_resume_agent_settings_tree" model="ir.ui.view">
+        <field name="name">resume.agent.settings.tree</field>
+        <field name="model">resume.agent.settings</field>
+        <field name="arch" type="xml">
+            <list string="Agent Settings">
+                <field name="agent_name"/>
+                <field name="company_name"/>
+                <field name="conversation_mode"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Agent Settings Action -->
+    <record id="action_resume_agent_settings" model="ir.actions.act_window">
+        <field name="name">Agent Settings</field>
+        <field name="res_model">resume.agent.settings</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

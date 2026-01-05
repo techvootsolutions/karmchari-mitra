@@ -1,0 +1,223 @@
+:root {
+    --primary-color: #00a2a6;
+    --secondary-color: #10b981;
+    --bg-color: #f3f4f6;
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.18);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+    overflow-x: hidden;
+}
+
+.font-outfit {
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Sidebar */
+#wrapper {
+    overflow-x: hidden;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem;
+    transition: margin 0.25s ease-out;
+    width: 15rem;
+    background: white !important;
+    /* Overriding bg-dark for clean look */
+    border-right: 1px solid #e5e7eb;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+#sidebar-wrapper .list-group {
+    width: 15rem;
+}
+
+#page-content-wrapper {
+    min-width: 100vw;
+    transition: margin 0.25s ease-out;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: 0;
+}
+
+#menu-toggle {
+    cursor: pointer;
+    color: var(--text-dark);
+}
+
+.list-group-item {
+    border: none;
+    padding: 20px 30px;
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.list-group-item.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    border-right: none;
+}
+
+.list-group-item {
+    border: none;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f3f4f6;
+    color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+/* Glass Header */
+.glass-header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Cards & Stats */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.bg-soft-primary {
+    background: #e0e7ff;
+    color: var(--primary-color);
+}
+
+.bg-soft-success {
+    background: #dcfce7;
+    color: var(--secondary-color);
+}
+
+.bg-soft-warning {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.bg-soft-danger {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+/* Table */
+.table-container {
+    /* No background here, using card inside */
+    margin-top: 1rem;
+}
+
+.table thead th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    background-color: #f9fafb;
+    /* Light gray header */
+    border-bottom: 1px solid #e5e7eb;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.table tbody td {
+    border-bottom: 1px solid #f3f4f6;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    color: var(--text-dark);
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Badges */
+.badge {
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+    font-size: 0.75rem;
+    border-radius: 6px;
+}
+
+/* Utilities */
+.text-primary-custom {
+    color: var(--primary-color);
+}
+
+.primary-text {
+    color: var(--primary-color);
+}
+
+.second-text {
+    color: var(--text-dark);
+}
+
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -15rem;
+    }
+}

@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Candidate Detail - Techvoot HR{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body text-center p-5">
+                <div class="avatar-circle mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                    {{ candidate.name[:2].upper() }}
+                </div>
+                <h3 class="fw-bold font-outfit mb-1">{{ candidate.name }}</h3>
+                <p class="text-muted mb-3">{{ candidate.job_title }}</p>
+
+                <div class="mb-4">
+                    {% set status_color = 'warning' %}
+                    {% if candidate.status == 'contacted' %}
+                    {% set status_color = 'info' %}
+                    {% elif candidate.status == 'qualified' %}
+                    {% set status_color = 'success' %}
+                    {% elif candidate.status in ['not_interested', 'rejected'] %}
+                    {% set status_color = 'danger' %}
+                    {% endif %}
+                    <span class="badge bg-soft-{{ status_color }} text-{{ status_color }} px-3 py-2 rounded-pill">
+                        {{ candidate.status|replace('_', ' ')|title }}
+                    </span>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="/call-script/{{ candidate.id }}" class="btn btn-primary">
+                        <i class="fas fa-file-alt me-2"></i> View Call Script
+                    </a>
+                    <button onclick="deleteCandidate({{ candidate.id }})" class="btn btn-outline-danger">
+                        <i class="fas fa-trash me-2"></i> Delete Candidate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8 mb-4">
+        <!-- Details Card -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-0 fw-bold font-outfit py-3">
+                <i class="fas fa-info-circle me-2 text-primary"></i> Contact Details
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="small text-muted text-uppercase fw-bold">Phone</label>
+                        <p class="mb-0 fw-medium">{{ candidate.phone }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted text-uppercase fw-bold">Email</label>
+                        <p class="mb-0 fw-medium">{{ candidate.email or 'N/A' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted text-uppercase fw-bold">Date Added</label>
+                        <p class="mb-0 fw-medium">{{ candidate.created_at }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted text-uppercase fw-bold">Last Call</label>
+                        <p class="mb-0 fw-medium">{{ candidate.last_call_date or 'Never' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call History -->
+        <div class="card shadow-sm border-0">
+            <div
+                class="card-header bg-white border-0 fw-bold font-outfit py-3 d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-history me-2 text-primary"></i> Call History</span>
+                <span class="badge bg-light text-dark">{{ call_logs|length }} calls</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-uppercase small text-muted">
+                            <tr>
+                                <th class="ps-4">Date</th>
+                                <th>Status</th>
+                                <th>Duration</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in call_logs %}
+                            <tr>
+                                <td class="ps-4 text-nowrap">
+                                    {{ log.call_time }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">{{ log.outcome|title }}</span>
+                                </td>
+                                <td>{{ log.duration or 0 }}s</td>
+                                <td>
+                                    {% if log.recording_url %}
+                                    <div class="mb-2">
+                                        <audio controls src="{{ log.recording_url }}"
+                                            style="height: 30px; width: 200px;"></audio>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if log.transcript %}
+                                    <button class="btn btn-sm btn-link text-decoration-none p-0" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#transcript-{{ loop.index }}">
+                                        <i class="fas fa-align-left me-1"></i> View Transcript
+                                    </button>
+                                    <div class="collapse mt-2" id="transcript-{{ loop.index }}">
+                                        <div class="card card-body bg-light border-0 small text-muted">
+                                            {{ log.transcript }}
+                                        </div>
+                                    </div>
+                                    {% elif log.analysis %}
+                                    <small class="text-muted d-block text-truncate" style="max-width: 200px;">{{
+                                        log.analysis }}</small>
+                                    {% else %}
+                                    <span class="text-muted small">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="fas fa-phone-slash mb-3" style="font-size: 2rem; opacity: 0.5;"></i>
+                                    <p>No calls logged yet.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Helper for delete button (since dashboard.js is loaded) -->
+<script>
+    async function deleteCandidate(id) {
+        if (!confirm('Are you sure you want to delete this candidate?')) return;
+        try {
+            const res = await fetch(`/api/delete_candidate/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) window.location.href = '/candidates';
+            else alert('Error: ' + data.error);
+        } catch (e) { alert('Error: ' + e); }
+    }
+</script>
+{% endblock %}

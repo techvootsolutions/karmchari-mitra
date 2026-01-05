@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Candidate Tree View -->
+    <record id="view_resume_candidate_tree" model="ir.ui.view">
+        <field name="name">resume.candidate.tree</field>
+        <field name="model">resume.candidate</field>
+        <field name="arch" type="xml">
+            <list string="Candidates" decoration-info="status=='pending'" decoration-success="status=='contacted'" decoration-muted="status=='rejected'">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="position"/>
+                <field name="source"/>
+                <field name="status" widget="badge" decoration-success="status=='hired'" decoration-info="status=='contacted'" decoration-warning="status=='interviewed'" decoration-danger="status=='rejected'"/>
+                <field name="conversation_count"/>
+                <field name="added_date"/>
+                <field name="last_contacted"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Candidate Form View -->
+    <record id="view_resume_candidate_form" model="ir.ui.view">
+        <field name="name">resume.candidate.form</field>
+        <field name="model">resume.candidate</field>
+        <field name="arch" type="xml">
+            <form string="Candidate">
+                <header>
+                    <button name="action_start_conversation" string="Start Phone Call" type="object" class="oe_highlight" icon="fa-phone"/>
+                    <button name="action_view_conversations" string="View Conversations" type="object" icon="fa-list"/>
+                    <button name="action_extract_cv_data" string="Extract CV Data" type="object" icon="fa-file-text" invisible="not cv_file"/>
+                    <button name="action_run_ats_analysis" string="Run ATS Analysis" type="object" class="oe_highlight" icon="fa-check-circle" invisible="not cv_text"/>
+                    <button name="action_evaluate_against_job" string="Evaluate Against Job" type="object" icon="fa-check-square" invisible="not job_position_id"/>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,contacted,interviewed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_conversations" type="object" class="oe_stat_button" icon="fa-comments">
+                            <field name="conversation_count" widget="statinfo" string="Conversations"/>
+                        </button>
+                        <button name="action_run_ats_analysis" type="object" class="oe_stat_button" icon="fa-check-circle" invisible="ats_overall_score == 0">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">ATS Score</span>
+                                <span class="o_stat_value">
+                                    <field name="ats_overall_score" widget="statinfo"/>
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="position"/>
+                            <field name="job_position_id"/>
+                        </group>
+                        <group>
+                            <field name="source"/>
+                            <field name="linkedin"/>
+                            <field name="added_date"/>
+                            <field name="last_contacted"/>
+                        </group>
+                    </group>
+                    <group string="CV Upload" col="2">
+                        <field name="cv_file" filename="cv_filename" widget="binary"/>
+                        <group>
+                            <field name="cv_filename" readonly="1" placeholder="No CV uploaded"/>
+                            <field name="cv_upload_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="CV Information" name="cv_info">
+                            <group>
+                                <group string="Extracted CV Data">
+                                    <field name="education" widget="text" placeholder="Education details will be extracted from CV..."/>
+                                    <field name="work_experience" widget="text" placeholder="Work experience will be extracted from CV..."/>
+                                    <field name="skills" widget="text" placeholder="Skills will be extracted from CV..."/>
+                                    <field name="certifications" widget="text" placeholder="Certifications will be extracted from CV..."/>
+                                </group>
+                                <group string="Additional Information">
+                                    <field name="languages" placeholder="Languages will be extracted from CV..."/>
+                                    <field name="years_of_experience" placeholder="Years of experience will be extracted from CV..."/>
+                                    <field name="address" widget="text" placeholder="Address will be extracted from CV..."/>
+                                    <field name="date_of_birth"/>
+                                </group>
+                            </group>
+                            <group string="CV Text Content" col="1">
+                                <field name="cv_text" widget="text" readonly="1" nolabel="1" placeholder="CV text content will appear here after upload..."/>
+                            </group>
+                        </page>
+                        <page string="Collected Information" name="collected_info">
+                            <group>
+                                <group>
+                                    <field name="introduction" widget="text"/>
+                                    <field name="current_position"/>
+                                    <field name="current_salary"/>
+                                </group>
+                                <group>
+                                    <field name="expected_salary"/>
+                                    <field name="notice_period"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="ATS Resume Checker" name="ats_analysis">
+                            <div class="alert alert-info" role="alert" invisible="ats_overall_score > 0">
+                                <strong>📊 ATS Resume Checker</strong><br/>
+                                Click "Run ATS Analysis" button in the header to analyze this resume for ATS compatibility.
+                                <br/><br/>
+                                <strong>Two-Tier Scoring System:</strong><br/>
+                                1. <strong>Tier 1 (Content Interpretation):</strong> How well the ATS can interpret your resume<br/>
+                                2. <strong>Tier 2 (Content Quality):</strong> Spelling, grammar, and quantifiable achievements
+                            </div>
+                            <group invisible="ats_overall_score == 0">
+                                <group string="ATS Scores" col="3">
+                                    <div class="oe_read_only">
+                                        <label for="ats_overall_score" string="Overall ATS Score"/>
+                                        <div style="font-size: 24px; font-weight: bold; color: #875A7B; margin-top: 5px;">
+                                            <field name="ats_overall_score" readonly="1" nolabel="1"/>
+                                            <span>/ 100</span>
+                                        </div>
+                                    </div>
+                                    <div class="oe_read_only">
+                                        <label for="ats_score_tier1" string="Tier 1: Content Interpretation"/>
+                                        <div style="font-size: 18px; font-weight: bold; color: #7C7BAD; margin-top: 5px;">
+                                            <field name="ats_score_tier1" readonly="1" nolabel="1"/>
+                                            <span>/ 100</span>
+                                        </div>
+                                        <div style="margin-top: 5px; font-size: 12px; color: #666;">
+                                            <field name="ats_interpretable_content_pct" readonly="1" nolabel="1"/>
+                                            <span>% interpretable</span>
+                                        </div>
+                                    </div>
+                                    <div class="oe_read_only">
+                                        <label for="ats_score_tier2" string="Tier 2: Content Quality"/>
+                                        <div style="font-size: 18px; font-weight: bold; color: #7C7BAD; margin-top: 5px;">
+                                            <field name="ats_score_tier2" readonly="1" nolabel="1"/>
+                                            <span>/ 100</span>
+                                        </div>
+                                    </div>
+                                </group>
+                                <group string="Analysis Summary" col="2">
+                                    <group>
+                                        <field name="ats_keywords_found" widget="text" readonly="1" placeholder="No keywords found"/>
+                                        <field name="ats_quantifiable_achievements" readonly="1"/>
+                                        <field name="ats_analysis_date" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="ats_spelling_errors" readonly="1"/>
+                                        <field name="ats_grammar_errors" readonly="1"/>
+                                        <field name="ats_missing_sections" widget="text" readonly="1" placeholder="All sections present"/>
+                                    </group>
+                                </group>
+                                <!-- Detailed breakdown fields - will be available after module upgrade -->
+                                <!-- Uncomment after upgrading the module -->
+                                <!--
+                                <group string="Tier 1 Scoring Breakdown" col="1" invisible="not ats_tier1_breakdown or not ats_overall_score">
+                                    <field name="ats_tier1_breakdown" widget="text" readonly="1" nolabel="1"/>
+                                </group>
+                                <group string="Tier 2 Scoring Breakdown" col="1" invisible="not ats_tier2_breakdown or not ats_overall_score">
+                                    <field name="ats_tier2_breakdown" widget="text" readonly="1" nolabel="1"/>
+                                </group>
+                                <group string="Issues Found" col="1" invisible="not ats_issues_found or ats_issues_found == 'No major issues found.' or not ats_overall_score">
+                                    <field name="ats_issues_found" widget="text" readonly="1" nolabel="1"/>
+                                </group>
+                                <group string="Quantifiable Achievements" col="1" invisible="ats_quantifiable_achievements == 0 or not ats_overall_score">
+                                    <field name="ats_achievements_list" widget="text" readonly="1" nolabel="1"/>
+                                </group>
+                                -->
+                                <group string="Recommendations" col="1">
+                                    <field name="ats_recommendations" widget="text" readonly="1" nolabel="1" placeholder="No recommendations available"/>
+                                </group>
+                                <group string="Detailed Analysis (JSON)" col="1" invisible="not ats_analysis_details">
+                                    <field name="ats_analysis_details" widget="text" readonly="1" nolabel="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Candidate Action -->
+    <record id="action_resume_candidate" model="ir.actions.act_window">
+        <field name="name">Candidates</field>
+        <field name="res_model">resume.candidate</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first candidate!
+            </p>
+            <p>
+                Add candidates to start managing resume follow-up conversations.
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Techvoot HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="fw-bold font-outfit text-dark mb-4">Analytics Reports</h4>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="row g-3 mb-5">
+        {% for stat in status_dist %}
+        <div class="col-md-3">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+                <div>
+                    <p class="text-muted mb-1 small fw-bold text-uppercase">{{ stat.status }}</p>
+                    <h3 class="fw-bold mb-0 font-outfit">{{ stat.count }}</h3>
+                </div>
+                <!-- Dynamic Icon Logic -->
+                {% set icon = 'fa-user' %}
+                {% set color = 'primary' %}
+                {% if stat.status == 'contacted' %} {% set icon = 'fa-check-circle' %} {% set color = 'success' %}
+                {% elif stat.status == 'pending' %} {% set icon = 'fa-clock' %} {% set color = 'warning' %}
+                {% elif stat.status == 'not_interested' or stat.status == 'rejected' %} {% set icon = 'fa-times-circle'
+                %} {% set color = 'danger' %}
+                {% endif %}
+
+                <div class="icon-box bg-soft-{{ color }}">
+                    <i class="fas {{ icon }}"></i>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Call Activity Table -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="fw-bold m-0 font-outfit text-primary"><i class="fas fa-chart-line me-2"></i> Call Activity Log
+                (Last 7 Days)</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase small text-muted">
+                        <tr>
+                            <th class="ps-4">Date</th>
+                            <th>Total Calls</th>
+                            <th>Contacted</th>
+                            <th>Not Interested</th>
+                            <th class="text-end pe-4">Success Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in daily_stats %}
+                        <tr>
+                            <td class="ps-4 fw-medium">{{ log.date }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ log.total_calls }}</span></td>
+                            <td class="text-success fw-bold">{{ log.contacted }}</td>
+                            <td class="text-danger fw-bold">{{ log.not_interested }}</td>
+                            <td class="text-end pe-4">
+                                {% if log.total_calls > 0 %}
+                                {% set rate = ((log.contacted / log.total_calls) * 100)|round|int %}
+                                <span class="badge bg-soft-{{ 'success' if rate > 50 else 'warning' }} text-dark">{{
+                                    rate }}%</span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-chart-bar mb-3" style="font-size: 2rem; opacity: 0.5;"></i>
+                                <p>No call activity recorded yet.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
